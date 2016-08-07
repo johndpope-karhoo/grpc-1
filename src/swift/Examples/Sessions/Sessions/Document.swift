@@ -50,6 +50,13 @@ extension NSTextView {
   }
 }
 
+// http://stackoverflow.com/a/28976644/35844
+func sync(lock: AnyObject, closure: () -> Void) {
+  objc_sync_enter(lock)
+  closure()
+  objc_sync_exit(lock)
+}
+
 class Document: NSDocument {
 
   @IBOutlet weak var hostField: NSTextField!
@@ -57,9 +64,8 @@ class Document: NSDocument {
   @IBOutlet weak var connectionSelector: NSSegmentedControl!
   @IBOutlet weak var startButton: NSButton!
   @IBOutlet var textView: NSTextView!
-  var running: Bool
-
   // http://stackoverflow.com/questions/24062437/cannot-form-weak-reference-to-instance-of-class-nstextview
+  var running: Bool
 
   override init() {
     running = false
@@ -124,6 +130,20 @@ class Document: NSDocument {
     connectionSelector.isEnabled = true
   }
 
+  func setIsRunning(_ value:Bool) {
+    sync(lock:self) {
+      self.running = value
+    }
+  }
+
+  func isRunning() -> Bool {
+    var result:Bool = false
+    sync(lock:self) {
+      result = self.running
+    }
+    return result
+  }
+
   func startServer(address:String) {
     DispatchQueue.global(attributes: [.qosDefault]).async {
       self.log("Starting Server")
@@ -131,9 +151,9 @@ class Document: NSDocument {
       do {
         let server = gRPC.Server(address:address)
         server.start()
-        self.running = true
+        self.setIsRunning(true)
         var requestCount = 0
-        while(self.running) {
+        while(self.isRunning()) {
           let (completionType, requestHandler) = server.getNextRequest(timeout:1.0)
           if (completionType == GRPC_OP_COMPLETE) {
             if let requestHandler = requestHandler {
@@ -147,7 +167,7 @@ class Document: NSDocument {
               let (_, message) = requestHandler.receiveMessage()
               self.log("\(requestCount): Received message: " + message!.string())
               if requestHandler.method() == "/quit" {
-                self.running = false
+                self.stopServer()
               }
               let replyMessage = "thank you very much!"
               let _ = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage))
@@ -156,7 +176,7 @@ class Document: NSDocument {
           } else if (completionType == GRPC_QUEUE_TIMEOUT) {
             // everything is fine
           } else if (completionType == GRPC_QUEUE_SHUTDOWN) {
-            self.running = false
+            self.stopServer()
           }
         }
       }
@@ -166,7 +186,7 @@ class Document: NSDocument {
   }
 
   func stopServer() {
-    running = false
+    setIsRunning(false)
   }
 
   func startClient(address:String) {
@@ -180,9 +200,9 @@ class Document: NSDocument {
       do {
         let c = gRPC.Client(address:address)
         let steps = 10
-        self.running = true
+        self.setIsRunning(true)
         for i in 1...steps {
-          if !self.running {
+          if !self.isRunning() {
             break
           }
           let method = (i < steps) ? "/hello" : "/quit"
@@ -225,6 +245,6 @@ class Document: NSDocument {
   }
   
   func stopClient() {
-    running = false
+    setIsRunning(false)
   }
 }
