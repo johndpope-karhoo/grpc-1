@@ -129,7 +129,8 @@ void grpcshim_server_start(grpcshim_server *s);
 grpcshim_handler *grpcshim_server_create_handler(grpcshim_server *s);
 
 // completion queues
-grpc_completion_type grpcshim_completion_queue_get_next_event(grpcshim_completion_queue *cq);
+grpc_completion_type grpcshim_completion_queue_get_next_event(grpcshim_completion_queue *cq,
+                                                              double timeout);
 void grpcshim_completion_queue_drain(grpcshim_completion_queue *cq);
 
 // server request handlers
@@ -137,9 +138,12 @@ void grpcshim_handler_destroy(grpcshim_handler *h);
 grpcshim_call *grpcshim_handler_get_call(grpcshim_handler *h);
 grpcshim_completion_queue *grpcshim_handler_get_completion_queue(grpcshim_handler *h);
 
-void grpcshim_handler_wait_for_request(grpcshim_handler *h, grpcshim_metadata_array *metadata);
+grpc_completion_type grpcshim_handler_wait_for_request(grpcshim_handler *h,
+                                                       grpcshim_metadata_array *metadata,
+                                                       double timeout);
 const char *grpcshim_handler_host(grpcshim_handler *h);
 const char *grpcshim_handler_method(grpcshim_handler *h);
+const char *grpcshim_handler_call_peer(grpcshim_handler *h);
 
 // call support
 void grpcshim_call_destroy(grpcshim_call *call);

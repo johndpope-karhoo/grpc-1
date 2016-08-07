@@ -51,12 +51,13 @@ public class Call {
 
   func performOperations(completionQueue: CompletionQueue,
                          operations: [Operation],
-                         tag: Int) -> grpc_completion_type {
+                         tag: Int,
+                         timeout: Double) -> grpc_completion_type {
     grpcshim_call_reserve_space_for_operations(call, Int32(operations.count))
     for operation in operations {
       grpcshim_call_add_operation(call, operation.observer)
     }
     grpcshim_call_perform(call, tag)
-    return completionQueue.waitForCompletion()
+    return completionQueue.waitForCompletion(timeout:timeout)
   }
 }

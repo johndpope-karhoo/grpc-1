@@ -35,7 +35,6 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <strings.h>
 
 void *grpcshim_create_tag(intptr_t t) { return (void *)t; }
 

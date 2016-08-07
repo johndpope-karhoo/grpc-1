@@ -44,7 +44,9 @@ void grpcshim_handler_destroy(grpcshim_handler *h) {
   grpc_completion_queue_destroy(h->completion_queue);
   grpc_metadata_array_destroy(&(h->request_metadata_recv));
   grpc_call_details_destroy(&(h->call_details));
-  grpc_call_destroy(h->server_call);
+  if (h->server_call) {
+    grpc_call_destroy(h->server_call);
+  }
   free(h);
 }
 
@@ -54,6 +56,10 @@ const char *grpcshim_handler_host(grpcshim_handler *h) {
 
 const char *grpcshim_handler_method(grpcshim_handler *h) {
   return h->call_details.method;
+}
+
+const char *grpcshim_handler_call_peer(grpcshim_handler *h) {
+  return grpc_call_get_peer(h->server_call);
 }
 
 grpcshim_call *grpcshim_handler_get_call(grpcshim_handler *h) {
@@ -67,7 +73,9 @@ grpcshim_completion_queue *grpcshim_handler_get_completion_queue(grpcshim_handle
   return h->completion_queue;
 }
 
-void grpcshim_handler_wait_for_request(grpcshim_handler *h, grpcshim_metadata_array *metadata) {
+grpc_completion_type grpcshim_handler_wait_for_request(grpcshim_handler *h,
+                                                       grpcshim_metadata_array *metadata,
+                                                       double timeout) {
   void *tag101 = grpcshim_create_tag(101);
   grpc_call_error error = grpc_server_request_call(h->server->server,
                                                    &(h->server_call),
@@ -78,11 +86,10 @@ void grpcshim_handler_wait_for_request(grpcshim_handler *h, grpcshim_metadata_ar
                                                    tag101);
   assert(error == GRPC_CALL_OK);
 
-  // server waits for a request
-  grpc_completion_type status = grpcshim_completion_queue_get_next_event(h->server->completion_queue);
-  printf("status: %d\n", status);
-  printf("call details: %s %s\n",
-         h->call_details.host,
-         h->call_details.method);
-  printf("call peer: %s\n", grpc_call_get_peer(h->server_call));
+  // wait for a request
+  return grpcshim_completion_queue_get_next_event(h->server->completion_queue, timeout);
 }
+
+
+
+

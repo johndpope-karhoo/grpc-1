@@ -33,18 +33,19 @@
 import Cocoa
 import gRPC
 
-
 // https://gist.github.com/rickw/cc198001f5f3aa59ae9f
 extension NSTextView {
   func appendText(line: String) {
     DispatchQueue.main.async {
-      let attrDict = [NSFontAttributeName: NSFont.systemFont(ofSize:12.0)]
-      let astring = AttributedString(string: "\(line)\n", attributes: attrDict)
-      self.textStorage?.append(astring)
-      let loc = self.string?.lengthOfBytes(using:String.Encoding.utf8)
-
-      let range = NSRange(location: loc!, length: 0)
-      self.scrollRangeToVisible(range)
+      if let textStorage = self.textStorage {
+        let attributedString = AttributedString(string: "\(line)\n",
+                                                attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)])
+        textStorage.append(attributedString)
+      }
+      if let contents = self.string {
+        let location = contents.lengthOfBytes(using:String.Encoding.utf8)
+        self.scrollRangeToVisible(NSRange(location: location, length: 0))
+      }
     }
   }
 }
@@ -56,10 +57,13 @@ class Document: NSDocument {
   @IBOutlet weak var connectionSelector: NSSegmentedControl!
   @IBOutlet weak var startButton: NSButton!
   @IBOutlet var textView: NSTextView!
+  var running: Bool
+
   // http://stackoverflow.com/questions/24062437/cannot-form-weak-reference-to-instance-of-class-nstextview
 
   override init() {
-      super.init()
+    running = false
+    super.init()
   }
 
   override class func autosavesInPlace() -> Bool {
@@ -98,7 +102,6 @@ class Document: NSDocument {
 
       self.textView.textStorage!.setAttributedString(AttributedString(string:"", attributes: [:]))
 
-
       let address = hostField.stringValue + ":" + portField.stringValue
       if (connectionSelector.selectedSegment == 0) {
         startClient(address:address)
@@ -106,7 +109,11 @@ class Document: NSDocument {
         startServer(address:address)
       }
     } else {
-      stopEverything()
+      if (connectionSelector.selectedSegment == 0) {
+        stopClient()
+      } else {
+        stopServer()
+      }
     }
   }
 
@@ -115,35 +122,51 @@ class Document: NSDocument {
     hostField.isEnabled = true
     portField.isEnabled = true
     connectionSelector.isEnabled = true
-
   }
 
   func startServer(address:String) {
     DispatchQueue.global(attributes: [.qosDefault]).async {
+      self.log("Starting Server")
       self.log("GRPC version " + gRPC.version())
       do {
         let server = gRPC.Server(address:address)
         server.start()
-        var running = true
-        while(running) {
-          let requestHandler = server.getNextRequest()
-          self.log("HOST: " + requestHandler.host())
-          self.log("METHOD: " + requestHandler.method())
-          let initialMetadata = requestHandler.requestMetadata
-          for i in 0..<initialMetadata.count() {
-            self.log("INITIAL METADATA -> " + initialMetadata.key(index:i) + ":" + initialMetadata.value(index:i))
-          }
+        self.running = true
+        var requestCount = 0
+        while(self.running) {
+          let (completionType, requestHandler) = server.getNextRequest(timeout:1.0)
+          if (completionType == GRPC_OP_COMPLETE) {
+            if let requestHandler = requestHandler {
+              requestCount += 1
+              self.log("\(requestCount): Received request " + requestHandler.host() + " " + requestHandler.method() + " from " + requestHandler.caller())
+              let initialMetadata = requestHandler.requestMetadata
+              for i in 0..<initialMetadata.count() {
+                self.log("\(requestCount): Received initial metadata -> " + initialMetadata.key(index:i) + ":" + initialMetadata.value(index:i))
+              }
 
-          let (_, message) = requestHandler.receiveMessage()
-          self.log("MESSAGE " + message!.string())
-          if requestHandler.method() == "/quit" {
-            running = false
+              let (_, message) = requestHandler.receiveMessage()
+              self.log("\(requestCount): Received message: " + message!.string())
+              if requestHandler.method() == "/quit" {
+                self.running = false
+              }
+              let replyMessage = "thank you very much!"
+              let _ = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage))
+              self.log("------------------------------")
+            }
+          } else if (completionType == GRPC_QUEUE_TIMEOUT) {
+            // everything is fine
+          } else if (completionType == GRPC_QUEUE_SHUTDOWN) {
+            self.running = false
           }
-          let _ = requestHandler.sendResponse(message:ByteBuffer(string:"thank you very much!"))
         }
       }
-      self.log("DONE")
+      self.log("Stopped Server")
+      self.stopEverything()
     }
+  }
+
+  func stopServer() {
+    running = false
   }
 
   func startClient(address:String) {
@@ -151,13 +174,18 @@ class Document: NSDocument {
       let host = "foo.test.google.fr"
       let message = gRPC.ByteBuffer(string:"hello gRPC server!")
 
+      self.log("Starting Client")
       self.log("GRPC version " + gRPC.version())
 
       do {
         let c = gRPC.Client(address:address)
-        let steps = 30
-        for i in 0..<steps {
-          let method = (i < steps-1) ? "/hello" : "/quit"
+        let steps = 10
+        self.running = true
+        for i in 1...steps {
+          if !self.running {
+            break
+          }
+          let method = (i < steps) ? "/hello" : "/quit"
 
           let metadata = Metadata(pairs:[MetadataPair(key:"x", value:"xylophone"),
                                          MetadataPair(key:"y", value:"yu"),
@@ -167,29 +195,36 @@ class Document: NSDocument {
                                           method:method,
                                           message:message,
                                           metadata:metadata)
-          //self.log("status: " + response.status)
-          self.log("statusDetails: " + response.statusDetails)
-          if let message = response.message {
-            self.log("message: " + message.string())
-          }
 
           let initialMetadata = response.initialMetadata!
-          for i in 0..<initialMetadata.count() {
-            self.log("INITIAL METADATA -> " + initialMetadata.key(index:i) + " : " + initialMetadata.value(index:i))
+          for j in 0..<initialMetadata.count() {
+            self.log("\(i): Received initial metadata -> " + initialMetadata.key(index:j) + " : " + initialMetadata.value(index:j))
+          }
+
+          self.log("\(i): Received status: \(response.status) " + response.statusDetails)
+          if let message = response.message {
+            self.log("\(i): Received message: " + message.string())
           }
 
           let trailingMetadata = response.trailingMetadata!
-          for i in 0..<trailingMetadata.count() {
-            self.log("TRAILING METADATA -> " + trailingMetadata.key(index:i) + " : " + trailingMetadata.value(index:i))
+          for j in 0..<trailingMetadata.count() {
+            self.log("\(i): Received trailing metadata -> " + trailingMetadata.key(index:j) + " : " + trailingMetadata.value(index:j))
           }
+          self.log("------------------------------")
 
           if (response.status != 0) {
             break
           }
+
+          sleep(1)
         }
       }
-      self.log("DONE")
+      self.log("Stopped Client")
+      self.stopEverything()
     }
   }
-
+  
+  func stopClient() {
+    running = false
+  }
 }

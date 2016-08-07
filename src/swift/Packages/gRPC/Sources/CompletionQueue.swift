@@ -40,7 +40,7 @@ public class CompletionQueue {
     self.cq = cq
   }
 
-  func waitForCompletion() -> grpc_completion_type {
-    return grpcshim_completion_queue_get_next_event(cq);
+  func waitForCompletion(timeout: Double) -> grpc_completion_type {
+    return grpcshim_completion_queue_get_next_event(cq, timeout);
   }
 }

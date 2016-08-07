@@ -83,7 +83,8 @@ public class Client {
     let call = self.createCall(method:method, host:host, timeout:5)
     let call_status = call.performOperations(completionQueue:self.completionQueue(),
                                              operations:operations,
-                                             tag:111)
+                                             tag:111,
+                                             timeout:5)
     if (call_status == GRPC_OP_COMPLETE) {
       let response = CallResponse(status:operation_receiveStatusOnClient.status(),
                                   statusDetails:operation_receiveStatusOnClient.statusDetails(),

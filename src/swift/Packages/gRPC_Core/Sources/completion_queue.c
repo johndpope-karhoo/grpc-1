@@ -34,20 +34,11 @@
 #include "shim.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
-grpc_completion_type grpcshim_completion_queue_get_next_event(grpc_completion_queue *cq) {
-  gpr_timespec deadline = grpcshim_deadline_in_seconds_from_now(10000);
+grpc_completion_type grpcshim_completion_queue_get_next_event(grpc_completion_queue *cq,
+                                                              double timeout) {
+  gpr_timespec deadline = grpcshim_deadline_in_seconds_from_now(timeout);
   grpc_event ev = grpc_completion_queue_next(cq, deadline, NULL);
-  if (ev.type == GRPC_QUEUE_TIMEOUT) {
-    printf("event TIMEOUT\n");
-    exit(0);
-  } else if (ev.type == GRPC_QUEUE_SHUTDOWN ) {
-    printf("event SHUTDOWN\n");
-    exit(0);
-  } else if (ev.type == GRPC_OP_COMPLETE) {
-    printf("event COMPLETE %d\n", (int) ev.tag);
-  }
   return ev.type;
 }
 

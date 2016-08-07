@@ -31,7 +31,7 @@
  *
  */
 #if SWIFT_PACKAGE
-import gRPC_Core
+  import gRPC_Core
 #endif
 
 public class Server {
@@ -49,9 +49,11 @@ public class Server {
     grpcshim_server_start(s);
   }
 
-  public func getNextRequest() -> Handler {
+  public func getNextRequest(timeout: Double) -> (grpc_completion_type, Handler?) {
     let handler = Handler(h:grpcshim_server_create_handler(s))
-    grpcshim_handler_wait_for_request(handler.h, handler.requestMetadata.array)
-    return handler
+    let completionStatus = grpcshim_handler_wait_for_request(handler.h,
+                                                             handler.requestMetadata.array,
+                                                             timeout)
+    return (completionStatus, handler)
   }
 }

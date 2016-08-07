@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 grpcshim_server *grpcshim_server_create(const char *address) {
   grpcshim_server *server = (grpcshim_server *) malloc(sizeof (grpcshim_server));
@@ -71,6 +72,7 @@ void grpcshim_server_start(grpcshim_server *server) {
 
 grpcshim_handler *grpcshim_server_create_handler(grpcshim_server *server) {
   grpcshim_handler *handler = (grpcshim_handler *) malloc(sizeof (grpcshim_handler));
+  memset(handler, 0, sizeof(grpcshim_handler));
   handler->server = server;
   grpc_metadata_array_init(&(handler->request_metadata_recv));
   grpc_call_details_init(&(handler->call_details));

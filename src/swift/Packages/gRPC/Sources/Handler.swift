@@ -55,6 +55,10 @@ public class Handler {
     return String(cString:grpcshim_handler_method(h), encoding:String.Encoding.utf8)!;
   }
 
+  public func caller() -> String {
+    return String(cString:grpcshim_handler_call_peer(h), encoding:String.Encoding.utf8)!;
+  }
+
   func call() -> Call {
     return Call(call: grpcshim_handler_get_call(h), owned:false)
   }
@@ -82,7 +86,8 @@ public class Handler {
     let call = self.call()
     let call_status = call.performOperations(completionQueue:self.completionQueue(),
                                              operations:operations,
-                                             tag:222)
+                                             tag:222,
+                                             timeout:5)
     if (call_status == GRPC_OP_COMPLETE) {
       return (call_status, operation_receiveMessage.message())
     } else {
@@ -111,6 +116,9 @@ public class Handler {
     ]
 
     let call = self.call()
-    return call.performOperations(completionQueue:self.completionQueue(), operations:operations, tag:333)
+    return call.performOperations(completionQueue:self.completionQueue(),
+                                  operations:operations,
+                                  tag:333,
+                                  timeout:5)
   }
 }
