@@ -36,16 +36,14 @@ import gRPC
 // https://gist.github.com/rickw/cc198001f5f3aa59ae9f
 extension NSTextView {
   func appendText(line: String) {
-    DispatchQueue.main.async {
-      if let textStorage = self.textStorage {
-        textStorage.append(
-          AttributedString(string:line+"\n",
-                           attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)]))
-      }
-      if let contents = self.string {
-        self.scrollRangeToVisible(
-          NSRange(location:contents.lengthOfBytes(using:String.Encoding.utf8),length: 0))
-      }
+    if let textStorage = self.textStorage {
+      textStorage.append(
+        AttributedString(string:line+"\n",
+                         attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)]))
+    }
+    if let contents = self.string {
+      self.scrollRangeToVisible(
+        NSRange(location:contents.lengthOfBytes(using:String.Encoding.utf8),length: 0))
     }
   }
 }
@@ -66,7 +64,7 @@ class Document: NSDocument {
   @IBOutlet var textView: NSTextView!
   // http://stackoverflow.com/questions/24062437/cannot-form-weak-reference-to-instance-of-class-nstextview
 
-  var running: Bool // synchronize all accesses
+  var running: Bool // all accesses to this should be synchronized
 
   override init() {
     running = false
@@ -74,6 +72,7 @@ class Document: NSDocument {
   }
 
   override func close() {
+    self.textView = nil // prevents logging to the textView
     stop()
     super.close()
   }
@@ -96,8 +95,10 @@ class Document: NSDocument {
   }
 
   func log(_ line:String) {
-    if let view = self.textView {
-      view.appendText(line:line)
+    DispatchQueue.main.async {
+      if let view = self.textView {
+        view.appendText(line:line)
+      }
     }
   }
 
@@ -127,13 +128,12 @@ class Document: NSDocument {
 
   func updateInterfaceAfterStopping() {
     DispatchQueue.main.async {
-      if self.startButton == nil {
-        return
+      if self.startButton != nil {
+        self.startButton.title = "Start"
+        self.hostField.isEnabled = true
+        self.portField.isEnabled = true
+        self.connectionSelector.isEnabled = true
       }
-      self.startButton.title = "Start"
-      self.hostField.isEnabled = true
-      self.portField.isEnabled = true
-      self.connectionSelector.isEnabled = true
     }
   }
 
@@ -163,7 +163,7 @@ class Document: NSDocument {
 
       let server = gRPC.Server(address:address)
       server.start()
-      
+
       var requestCount = 0
       while(self.isRunning()) {
         let (completionType, requestHandler) = server.getNextRequest(timeout:1.0)
@@ -245,7 +245,7 @@ class Document: NSDocument {
         if (response.status != 0) {
           break
         }
-
+        
         sleep(1)
       }
       self.log("Client Stopped")
