@@ -34,6 +34,10 @@
 import gRPC_Core
 #endif
 
+class CallLock {
+  static let sharedInstance = CallLock()
+}
+
 public class Call {
   var call : UnsafeMutablePointer<Void>!
   var owned : Bool
@@ -57,7 +61,9 @@ public class Call {
     for operation in operations {
       grpcshim_call_add_operation(call, operation.observer)
     }
+    objc_sync_enter(CallLock.sharedInstance)
     grpcshim_call_perform(call, tag)
+    objc_sync_exit(CallLock.sharedInstance)
     return completionQueue.waitForCompletion(timeout:timeout)
   }
 }
