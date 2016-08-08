@@ -1,6 +1,6 @@
 # Sessions, a Swift gRPC Sample App
 
-This sample illustrates the use of experimental gRPC Swift APIs in
+This sample illustrates the use of experimental Swift gRPC APIs in
 clients and servers.
 
 The Sessions Xcode project contains a Mac app that can be used to 
