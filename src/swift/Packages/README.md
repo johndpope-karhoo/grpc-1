@@ -46,8 +46,8 @@ Start a docker instance with the following command:
 
 ## Configure git
 
-	git config --global user.email timburks@google.com
-	git config --global user.name "Tim Burks"
+	git config --global user.email <your email address>
+	git config --global user.name "<your name>"
 
 ## Fetch and build grpc
 	git clone https://github.com/timburks/grpc 
