@@ -38,13 +38,13 @@ extension NSTextView {
   func appendText(line: String) {
     DispatchQueue.main.async {
       if let textStorage = self.textStorage {
-        let attributedString = AttributedString(string: "\(line)\n",
-                                                attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)])
-        textStorage.append(attributedString)
+        textStorage.append(
+          AttributedString(string:line+"\n",
+                           attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)]))
       }
       if let contents = self.string {
-        let location = contents.lengthOfBytes(using:String.Encoding.utf8)
-        self.scrollRangeToVisible(NSRange(location: location, length: 0))
+        self.scrollRangeToVisible(
+          NSRange(location:contents.lengthOfBytes(using:String.Encoding.utf8),length: 0))
       }
     }
   }
@@ -65,15 +65,17 @@ class Document: NSDocument {
   @IBOutlet weak var startButton: NSButton!
   @IBOutlet var textView: NSTextView!
   // http://stackoverflow.com/questions/24062437/cannot-form-weak-reference-to-instance-of-class-nstextview
-  var running: Bool
+
+  var running: Bool // synchronize all accesses
 
   override init() {
     running = false
     super.init()
   }
 
-  override class func autosavesInPlace() -> Bool {
-    return true
+  override func close() {
+    stop()
+    super.close()
   }
 
   override var windowNibName: String? {
@@ -101,13 +103,7 @@ class Document: NSDocument {
 
   @IBAction func startButtonPressed(sender: NSButton){
     if sender.title == "Start" {
-      sender.title = "Stop"
-      hostField.isEnabled = false
-      portField.isEnabled = false
-      connectionSelector.isEnabled = false
-
-      self.textView.textStorage!.setAttributedString(AttributedString(string:"", attributes: [:]))
-
+      updateInterfaceBeforeStarting()
       let address = hostField.stringValue + ":" + portField.stringValue
       if (connectionSelector.selectedSegment == 0) {
         startClient(address:address)
@@ -115,19 +111,30 @@ class Document: NSDocument {
         startServer(address:address)
       }
     } else {
-      if (connectionSelector.selectedSegment == 0) {
-        stopClient()
-      } else {
-        stopServer()
-      }
+      stop()
     }
   }
 
-  func stopEverything() {
-    startButton.title = "Start"
-    hostField.isEnabled = true
-    portField.isEnabled = true
-    connectionSelector.isEnabled = true
+  func updateInterfaceBeforeStarting() {
+    startButton.title = "Stop"
+    hostField.isEnabled = false
+    portField.isEnabled = false
+    connectionSelector.isEnabled = false
+    if let textStorage = self.textView.textStorage {
+      textStorage.setAttributedString(AttributedString(string:"", attributes: [:]))
+    }
+  }
+
+  func updateInterfaceAfterStopping() {
+    DispatchQueue.main.async {
+      if self.startButton == nil {
+        return
+      }
+      self.startButton.title = "Start"
+      self.hostField.isEnabled = true
+      self.portField.isEnabled = true
+      self.connectionSelector.isEnabled = true
+    }
   }
 
   func setIsRunning(_ value:Bool) {
@@ -144,9 +151,13 @@ class Document: NSDocument {
     return result
   }
 
+  func stop() {
+    setIsRunning(false)
+  }
+
   func startServer(address:String) {
     DispatchQueue.global(attributes: [.qosDefault]).async {
-      self.log("Starting Server")
+      self.log("Server Starting")
       self.log("GRPC version " + gRPC.version())
       do {
         let server = gRPC.Server(address:address)
@@ -165,9 +176,11 @@ class Document: NSDocument {
               }
 
               let (_, message) = requestHandler.receiveMessage()
-              self.log("\(requestCount): Received message: " + message!.string())
+              if let message = message {
+                self.log("\(requestCount): Received message: " + message.string())
+              }
               if requestHandler.method() == "/quit" {
-                self.stopServer()
+                self.stop()
               }
               let replyMessage = "thank you very much!"
               let _ = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage))
@@ -176,17 +189,13 @@ class Document: NSDocument {
           } else if (completionType == GRPC_QUEUE_TIMEOUT) {
             // everything is fine
           } else if (completionType == GRPC_QUEUE_SHUTDOWN) {
-            self.stopServer()
+            self.stop()
           }
         }
       }
-      self.log("Stopped Server")
-      self.stopEverything()
+      self.log("Server Stopped")
+      self.updateInterfaceAfterStopping()
     }
-  }
-
-  func stopServer() {
-    setIsRunning(false)
   }
 
   func startClient(address:String) {
@@ -194,7 +203,7 @@ class Document: NSDocument {
       let host = "foo.test.google.fr"
       let message = gRPC.ByteBuffer(string:"hello gRPC server!")
 
-      self.log("Starting Client")
+      self.log("Client Starting")
       self.log("GRPC version " + gRPC.version())
 
       do {
@@ -216,9 +225,10 @@ class Document: NSDocument {
                                           message:message,
                                           metadata:metadata)
 
-          let initialMetadata = response.initialMetadata!
-          for j in 0..<initialMetadata.count() {
-            self.log("\(i): Received initial metadata -> " + initialMetadata.key(index:j) + " : " + initialMetadata.value(index:j))
+          if let initialMetadata = response.initialMetadata {
+            for j in 0..<initialMetadata.count() {
+              self.log("\(i): Received initial metadata -> " + initialMetadata.key(index:j) + " : " + initialMetadata.value(index:j))
+            }
           }
 
           self.log("\(i): Received status: \(response.status) " + response.statusDetails)
@@ -226,9 +236,10 @@ class Document: NSDocument {
             self.log("\(i): Received message: " + message.string())
           }
 
-          let trailingMetadata = response.trailingMetadata!
-          for j in 0..<trailingMetadata.count() {
-            self.log("\(i): Received trailing metadata -> " + trailingMetadata.key(index:j) + " : " + trailingMetadata.value(index:j))
+          if let trailingMetadata = response.trailingMetadata {
+            for j in 0..<trailingMetadata.count() {
+              self.log("\(i): Received trailing metadata -> " + trailingMetadata.key(index:j) + " : " + trailingMetadata.value(index:j))
+            }
           }
           self.log("------------------------------")
 
@@ -239,12 +250,8 @@ class Document: NSDocument {
           sleep(1)
         }
       }
-      self.log("Stopped Client")
-      self.stopEverything()
+      self.log("Client Stopped")
+      self.updateInterfaceAfterStopping()
     }
-  }
-  
-  func stopClient() {
-    setIsRunning(false)
   }
 }
