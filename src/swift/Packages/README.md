@@ -59,7 +59,7 @@ Start a docker instance with the following command:
 
 ## Build the gRPC packages
 	cd src/swift/Packages/
-	cd gRPC_Core; make; cd ..
+	cd CgRPC; make; cd ..
 	cd gRPC; make; cd ..
 	cd Server; make; make install; cd ..
 	cd Client; make; make install; cd ..
@@ -74,7 +74,7 @@ If you see an error like the following, please retry running `make`.
     warning: --depth is ignored in local clones; use file:// instead.
     Cloning into '/root/grpc/src/swift/Packages/Client/Packages/gRPC'...
     done.
-    No submodule mapping found in .gitmodules for path 'Packages/gRPC_Core-1.0.0'
+    No submodule mapping found in .gitmodules for path 'Packages/CgRPC-1.0.0'
     error: Git 2.0 or higher is required. Please update git and retry.
     make: *** [all] Error 1
 	
