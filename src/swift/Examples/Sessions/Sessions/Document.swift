@@ -38,7 +38,7 @@ extension NSTextView {
   func appendText(line: String) {
     if let textStorage = self.textStorage {
       textStorage.append(
-        AttributedString(string:line+"\n",
+        NSAttributedString(string:line+"\n",
                          attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)]))
     }
     if let contents = self.string {
@@ -122,7 +122,7 @@ class Document: NSDocument {
     portField.isEnabled = false
     connectionSelector.isEnabled = false
     if let textStorage = self.textView.textStorage {
-      textStorage.setAttributedString(AttributedString(string:"", attributes: [:]))
+      textStorage.setAttributedString(NSAttributedString(string:"", attributes: [:]))
     }
   }
 
@@ -156,7 +156,7 @@ class Document: NSDocument {
   }
 
   func startServer(address:String) {
-    DispatchQueue.global(attributes: [.qosDefault]).async {
+    DispatchQueue.global().async {
       self.log("Server Starting")
       self.log("GRPC version " + gRPC.version())
       self.setIsRunning(true)
@@ -199,7 +199,7 @@ class Document: NSDocument {
   }
 
   func startClient(address:String) {
-    DispatchQueue.global(attributes: [.qosDefault]).async {
+    DispatchQueue.global().async {
       self.log("Client Starting")
       self.log("GRPC version " + gRPC.version())
       self.setIsRunning(true)
