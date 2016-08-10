@@ -55,9 +55,10 @@ void grpcshim_call_add_operation(grpcshim_call *call, grpcshim_observer *observe
 }
 
 grpc_call_error grpcshim_call_perform(grpcshim_call *call, long t) {
-  return grpc_call_start_batch(call->call,
+  grpc_call_error error = grpc_call_start_batch(call->call,
                                call->ops,
                                call->ops_count,
                                grpcshim_create_tag(t),
                                NULL);
+  return error;
 }

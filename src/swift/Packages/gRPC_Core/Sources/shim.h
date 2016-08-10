@@ -46,6 +46,7 @@
 #define grpcshim_handler                          void
 #define grpcshim_metadata                         void
 #define grpcshim_metadata_array                   void
+#define grpcshim_mutex                            void
 #define grpcshim_observer                         void
 #define grpcshim_observer_send_initial_metadata   void
 #define grpcshim_observer_send_message            void
@@ -159,6 +160,12 @@ const char *grpcshim_metadata_array_get_key_at_index(grpcshim_metadata_array *ar
 const char *grpcshim_metadata_array_get_value_at_index(grpcshim_metadata_array *array, size_t index);
 void grpcshim_metadata_array_move_metadata(grpcshim_metadata_array *dest, grpcshim_metadata_array *src);
 void grpcshim_metadata_array_append_metadata(grpcshim_metadata_array *metadata, const char *key, const char *value);
+
+// mutex support
+grpcshim_mutex *grpcshim_mutex_create();
+void grpcshim_mutex_destroy(grpcshim_mutex *mu);
+void grpcshim_mutex_lock(grpcshim_mutex *mu);
+void grpcshim_mutex_unlock(grpcshim_mutex *mu);
 
 // byte buffer support
 void grpcshim_byte_buffer_destroy(grpcshim_byte_buffer *bb);

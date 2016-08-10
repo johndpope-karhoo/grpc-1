@@ -69,6 +69,7 @@ typedef grpc_byte_buffer grpcshim_byte_buffer;
 typedef grpc_completion_queue grpcshim_completion_queue;
 typedef grpc_metadata grpcshim_metadata;
 typedef grpc_metadata_array grpcshim_metadata_array;
+typedef gpr_mu grpcshim_mutex;
 
 // OPERATIONS
 

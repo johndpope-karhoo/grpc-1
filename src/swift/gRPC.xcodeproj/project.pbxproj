@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D3AC869E1D5BDC8E0042B341 /* mutex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AC869D1D5BDC8E0042B341 /* mutex.c */; };
+		D3AC86A01D5BDF210042B341 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3AC869F1D5BDF210042B341 /* Mutex.swift */; };
 		D3BD37371D5126380005E698 /* gRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = D3BD37361D5126380005E698 /* gRPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D3BD37821D5128480005E698 /* libgrpc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BD37811D5128480005E698 /* libgrpc.dylib */; };
 		D3DB56701D55BB4D00165560 /* ByteBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3DB56671D55BB4D00165560 /* ByteBuffer.swift */; };
@@ -32,6 +34,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D3AC869D1D5BDC8E0042B341 /* mutex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mutex.c; path = Packages/gRPC_Core/Sources/mutex.c; sourceTree = "<group>"; };
+		D3AC869F1D5BDF210042B341 /* Mutex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mutex.swift; path = Packages/gRPC/Sources/Mutex.swift; sourceTree = "<group>"; };
 		D3BD37331D5126380005E698 /* gRPC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = gRPC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3BD37361D5126380005E698 /* gRPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gRPC.h; sourceTree = "<group>"; };
 		D3BD37381D5126380005E698 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +113,7 @@
 		D3DB56791D55BB5500165560 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				D3AC869F1D5BDF210042B341 /* Mutex.swift */,
 				D3DB56671D55BB4D00165560 /* ByteBuffer.swift */,
 				D3DB56681D55BB4D00165560 /* Call.swift */,
 				D3DB56691D55BB4D00165560 /* Client.swift */,
@@ -133,6 +138,7 @@
 				D3F527791D559E7300059831 /* internal.c */,
 				D3F5277A1D559E7300059831 /* internal.h */,
 				D3F5277B1D559E7300059831 /* metadata.c */,
+				D3AC869D1D5BDC8E0042B341 /* mutex.c */,
 				D3F5277C1D559E7300059831 /* observers.c */,
 				D3F5277D1D559E7300059831 /* server.c */,
 				D3F5277E1D559E7300059831 /* shim.h */,
@@ -229,6 +235,7 @@
 				D3DB56721D55BB4D00165560 /* Client.swift in Sources */,
 				D3DB56751D55BB4D00165560 /* Handler.swift in Sources */,
 				D3F527801D559E7300059831 /* call.c in Sources */,
+				D3AC86A01D5BDF210042B341 /* Mutex.swift in Sources */,
 				D3DB56701D55BB4D00165560 /* ByteBuffer.swift in Sources */,
 				D3F527871D559E7300059831 /* observers.c in Sources */,
 				D3DB56711D55BB4D00165560 /* Call.swift in Sources */,
@@ -238,6 +245,7 @@
 				D3F527861D559E7300059831 /* metadata.c in Sources */,
 				D3F527881D559E7300059831 /* server.c in Sources */,
 				D3DB56771D55BB4D00165560 /* Operation.swift in Sources */,
+				D3AC869E1D5BDC8E0042B341 /* mutex.c in Sources */,
 				D3F527821D559E7300059831 /* completion_queue.c in Sources */,
 				D3F5277F1D559E7300059831 /* byte_buffer.c in Sources */,
 				D3DB56781D55BB4D00165560 /* Server.swift in Sources */,

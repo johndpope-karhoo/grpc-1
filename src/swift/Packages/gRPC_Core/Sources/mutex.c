@@ -30,45 +30,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#if SWIFT_PACKAGE
-import gRPC_Core
-#endif
+#include "internal.h"
+#include "shim.h"
 
-class CallLock {
-  var mutex : Mutex
-  init() {
-    mutex = Mutex()
-  }
-  static let sharedInstance = CallLock()
+grpcshim_mutex *grpcshim_mutex_create() {
+  grpcshim_mutex *mu = (grpcshim_mutex *) malloc(sizeof(grpcshim_mutex));
+  gpr_mu_init(mu);
+  return mu;
 }
 
-public class Call {
-  var call : UnsafeMutablePointer<Void>!
-  var owned : Bool
+void grpcshim_mutex_destroy(grpcshim_mutex *mu) {
+  gpr_mu_destroy(mu);
+  free(mu);
+}
 
-  init(call: UnsafeMutablePointer<Void>, owned: Bool) {
-    self.call = call
-    self.owned = owned
-  }
+void grpcshim_mutex_lock(grpcshim_mutex *mu) {
+  gpr_mu_lock(mu);
+}
 
-  deinit {
-    if (owned) {
-      grpcshim_call_destroy(call)
-    }
-  }
-
-  func performOperations(completionQueue: CompletionQueue,
-                         operations: [Operation],
-                         tag: Int,
-                         timeout: Double) -> grpc_completion_type {
-    grpcshim_call_reserve_space_for_operations(call, Int32(operations.count))
-    for operation in operations {
-      grpcshim_call_add_operation(call, operation.observer)
-    }
-    let mutex = CallLock.sharedInstance.mutex
-    mutex.lock()
-    grpcshim_call_perform(call, tag)
-    mutex.unlock()
-    return completionQueue.waitForCompletion(timeout:timeout)
-  }
+void grpcshim_mutex_unlock(grpcshim_mutex *mu) {
+  gpr_mu_unlock(mu);
 }
