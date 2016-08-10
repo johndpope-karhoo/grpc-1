@@ -31,7 +31,7 @@
  *
  */
 #if SWIFT_PACKAGE
-import gRPC_Core
+import CgRPC
 #endif
 
 public func initialize() {

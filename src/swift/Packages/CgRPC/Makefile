@@ -1,5 +1,5 @@
 SRCDIR = Sources
-SHAREDLIB = libgRPC_Core.so
+SHAREDLIB = libCgRPC.so
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)

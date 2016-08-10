@@ -1,6 +1,6 @@
-module gRPC_Core {
+module CgRPC {
   header "Sources/shim.h"
-  link "gRPC_Core"
+  link "CgRPC"
   link "grpc"
   export *
 }

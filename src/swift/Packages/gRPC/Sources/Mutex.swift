@@ -9,7 +9,7 @@
 import Foundation
 
 #if SWIFT_PACKAGE
-  import gRPC_Core
+  import CgRPC
 #endif
 
 public class Mutex {
