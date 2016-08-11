@@ -5,7 +5,9 @@
 //  Created by Tim Burks on 8/11/16.
 //  Copyright © 2016 Google. All rights reserved.
 //
-
+#if SWIFT_PACKAGE
+  import CgRPC
+#endif
 import Foundation
 
 /// Representation of a response to a gRPC call
