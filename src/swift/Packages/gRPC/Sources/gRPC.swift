@@ -33,6 +33,7 @@
 #if SWIFT_PACKAGE
   import CgRPC
 #endif
+import Foundation // for String.Encoding
 
 public func initialize() {
   grpc_init()

@@ -33,6 +33,7 @@
 #if SWIFT_PACKAGE
   import CgRPC
 #endif
+import Foundation // for String.Encoding
 
 /// Representation of raw data that may be sent and received using gRPC
 public class ByteBuffer {

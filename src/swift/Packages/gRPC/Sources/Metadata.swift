@@ -33,6 +33,7 @@
 #if SWIFT_PACKAGE
   import CgRPC
 #endif
+import Foundation // for String.Encoding
 
 public struct MetadataPair {
   public var key: String
