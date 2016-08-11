@@ -7,7 +7,7 @@ do {
   server.start()
   var running = true
   while(running) {
-    let (status, requestHandler) = server.getNextRequest(timeout:600)
+    let (_, status, requestHandler) = server.getNextRequest(timeout:600)
     if let requestHandler = requestHandler {
       print("HOST:", requestHandler.host())
       print("METHOD:", requestHandler.method())
