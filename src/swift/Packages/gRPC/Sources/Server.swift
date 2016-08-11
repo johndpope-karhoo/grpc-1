@@ -39,8 +39,11 @@ public class Server {
   /// Pointer to underlying C representation
   var s: UnsafeMutablePointer<Void>!
 
+  var completionQueue: CompletionQueue
+
   public init(address:String) {
     s = grpcshim_server_create(address)
+    completionQueue = CompletionQueue(cq:grpcshim_server_get_completion_queue(s))
   }
 
   deinit {
@@ -51,11 +54,18 @@ public class Server {
     grpcshim_server_start(s);
   }
 
-  public func getNextRequest(timeout: Double) -> (grpc_completion_type, Handler?) {
-    let handler = Handler(h:grpcshim_server_create_handler(s))
-    let completionStatus = grpcshim_handler_wait_for_request(handler.h,
-                                                             handler.requestMetadata.array,
-                                                             timeout)
-    return (completionStatus, handler)
+  public func getNextRequest(timeout: Double) -> (grpc_call_error, grpc_completion_type, Handler?) {
+    let handler = Handler(h:grpcshim_handler_create_with_server(s))
+    let call_error = handler.requestCall(tag:101)
+    if (call_error != GRPC_CALL_OK) {
+      return (call_error, GRPC_OP_COMPLETE, nil)
+    } else {
+      let completion_type = self.completionQueue.waitForCompletion(timeout:timeout)
+      if (completion_type == GRPC_OP_COMPLETE) {
+        return (GRPC_CALL_OK, GRPC_OP_COMPLETE, handler)
+      } else {
+        return (GRPC_CALL_OK, completion_type, nil)
+      }
+    }
   }
 }

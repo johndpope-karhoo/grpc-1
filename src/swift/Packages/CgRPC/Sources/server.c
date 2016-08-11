@@ -70,12 +70,6 @@ void grpcshim_server_start(grpcshim_server *server) {
   grpc_server_start(server->server);
 }
 
-grpcshim_handler *grpcshim_server_create_handler(grpcshim_server *server) {
-  grpcshim_handler *handler = (grpcshim_handler *) malloc(sizeof (grpcshim_handler));
-  memset(handler, 0, sizeof(grpcshim_handler));
-  handler->server = server;
-  grpc_metadata_array_init(&(handler->request_metadata_recv));
-  grpc_call_details_init(&(handler->call_details));
-  handler->completion_queue = grpc_completion_queue_create(NULL);
-  return handler;
+grpcshim_completion_queue *grpcshim_server_get_completion_queue(grpcshim_server *s) {
+  return s->completion_queue;
 }

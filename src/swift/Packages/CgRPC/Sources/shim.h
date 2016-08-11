@@ -127,7 +127,7 @@ grpcshim_completion_queue *grpcshim_client_completion_queue(grpcshim_client *cli
 grpcshim_server *grpcshim_server_create(const char *address);
 void grpcshim_server_destroy(grpcshim_server *s);
 void grpcshim_server_start(grpcshim_server *s);
-grpcshim_handler *grpcshim_server_create_handler(grpcshim_server *s);
+grpcshim_completion_queue *grpcshim_server_get_completion_queue(grpcshim_server *s);
 
 // completion queues
 grpc_completion_type grpcshim_completion_queue_get_next_event(grpcshim_completion_queue *cq,
@@ -135,10 +135,14 @@ grpc_completion_type grpcshim_completion_queue_get_next_event(grpcshim_completio
 void grpcshim_completion_queue_drain(grpcshim_completion_queue *cq);
 
 // server request handlers
+grpcshim_handler *grpcshim_handler_create_with_server(grpcshim_server *server);
 void grpcshim_handler_destroy(grpcshim_handler *h);
 grpcshim_call *grpcshim_handler_get_call(grpcshim_handler *h);
 grpcshim_completion_queue *grpcshim_handler_get_completion_queue(grpcshim_handler *h);
 
+grpc_call_error grpcshim_handler_request_call(grpcshim_handler *h,
+                                              grpcshim_metadata_array *metadata,
+                                              long tag);
 grpc_completion_type grpcshim_handler_wait_for_request(grpcshim_handler *h,
                                                        grpcshim_metadata_array *metadata,
                                                        double timeout);
@@ -150,7 +154,7 @@ const char *grpcshim_handler_call_peer(grpcshim_handler *h);
 void grpcshim_call_destroy(grpcshim_call *call);
 void grpcshim_call_reserve_space_for_operations(grpcshim_call *call, int max_operations);
 void grpcshim_call_add_operation(grpcshim_call *call, grpcshim_observer *observer);
-grpc_call_error grpcshim_call_perform(grpcshim_call *call, long t);
+grpc_call_error grpcshim_call_perform(grpcshim_call *call, long tag);
 
 // metadata support
 grpcshim_metadata_array *grpcshim_metadata_array_create();

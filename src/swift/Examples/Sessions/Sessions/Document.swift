@@ -166,8 +166,11 @@ class Document: NSDocument {
 
       var requestCount = 0
       while(self.isRunning()) {
-        let (completionType, requestHandler) = server.getNextRequest(timeout:1.0)
-        if (completionType == GRPC_OP_COMPLETE) {
+        let (callError, completionType, requestHandler) = server.getNextRequest(timeout:1.0)
+        if (callError != GRPC_CALL_OK) {
+          self.log("\(requestCount): Call error \(callError)")
+          self.log("------------------------------")
+        } else if (completionType == GRPC_OP_COMPLETE) {
           if let requestHandler = requestHandler {
             requestCount += 1
             self.log("\(requestCount): Received request " + requestHandler.host() + " " + requestHandler.method() + " from " + requestHandler.caller())

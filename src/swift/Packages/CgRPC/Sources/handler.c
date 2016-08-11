@@ -38,6 +38,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+grpcshim_handler *grpcshim_handler_create_with_server(grpcshim_server *server) {
+  grpcshim_handler *handler = (grpcshim_handler *) malloc(sizeof (grpcshim_handler));
+  memset(handler, 0, sizeof(grpcshim_handler));
+  handler->server = server;
+  grpc_metadata_array_init(&(handler->request_metadata_recv));
+  grpc_call_details_init(&(handler->call_details));
+  handler->completion_queue = grpc_completion_queue_create(NULL);
+  return handler;
+}
+
 void grpcshim_handler_destroy(grpcshim_handler *h) {
   grpc_completion_queue_shutdown(h->completion_queue);
   grpcshim_completion_queue_drain(h->completion_queue);
@@ -72,6 +82,19 @@ grpcshim_call *grpcshim_handler_get_call(grpcshim_handler *h) {
 grpcshim_completion_queue *grpcshim_handler_get_completion_queue(grpcshim_handler *h) {
   return h->completion_queue;
 }
+
+grpc_call_error grpcshim_handler_request_call(grpcshim_handler *h,
+                                              grpcshim_metadata_array *metadata,
+                                              long tag) {
+  return grpc_server_request_call(h->server->server,
+                                  &(h->server_call),
+                                  &(h->call_details),
+                                  metadata,
+                                  h->completion_queue,
+                                  h->server->completion_queue,
+                                  grpcshim_create_tag(tag));
+}
+
 
 grpc_completion_type grpcshim_handler_wait_for_request(grpcshim_handler *h,
                                                        grpcshim_metadata_array *metadata,

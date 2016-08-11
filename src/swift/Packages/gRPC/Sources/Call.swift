@@ -72,8 +72,7 @@ public class Call {
   /// - Parameter operations: array of operations to be performed
   /// - Parameter tag: integer tag that will be attached to these operations
   /// - Returns: the result of preparing the call
-  func performOperations(operations: [Operation],
-                         tag: Int) -> grpc_call_error {
+  func performOperations(operations: [Operation], tag: Int) -> grpc_call_error {
     grpcshim_call_reserve_space_for_operations(call, Int32(operations.count))
     for operation in operations {
       grpcshim_call_add_operation(call, operation.observer)

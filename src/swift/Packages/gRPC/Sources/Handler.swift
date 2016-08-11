@@ -70,6 +70,10 @@ public class Handler {
     return Call(call: grpcshim_handler_get_call(h), owned:false)
   }
 
+  func requestCall(tag: Int) -> grpc_call_error {
+    return grpcshim_handler_request_call(h, requestMetadata.array, tag)
+  }
+
   public func receiveMessage() -> (grpc_completion_type, ByteBuffer?) {
 
     let initialMetadata = Metadata()
