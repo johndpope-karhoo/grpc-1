@@ -39,7 +39,7 @@ extension NSTextView {
     if let textStorage = self.textStorage {
       textStorage.append(
         NSAttributedString(string:line+"\n",
-                         attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)]))
+                           attributes:[NSFontAttributeName:NSFont.systemFont(ofSize:12.0)]))
     }
     if let contents = self.string {
       self.scrollRangeToVisible(
@@ -179,7 +179,11 @@ class Document: NSDocument {
               self.log("\(requestCount): Received initial metadata -> " + initialMetadata.key(index:i) + ":" + initialMetadata.value(index:i))
             }
 
-            let (_, _, message) = requestHandler.receiveMessage()
+            let initialMetadataToSend = Metadata()
+            initialMetadataToSend.add(key:"a", value:"Apple")
+            initialMetadataToSend.add(key:"b", value:"Banana")
+            initialMetadataToSend.add(key:"c", value:"Cherry")
+            let (_, _, message) = requestHandler.receiveMessage(initialMetadata:initialMetadataToSend)
             if let message = message {
               self.log("\(requestCount): Received message: " + message.string())
             }
@@ -187,7 +191,12 @@ class Document: NSDocument {
               self.stop()
             }
             let replyMessage = "thank you very much!"
-            let (_, _) = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage))
+            let trailingMetadataToSend = Metadata()
+            trailingMetadataToSend.add(key:"0", value:"zero")
+            trailingMetadataToSend.add(key:"1", value:"one")
+            trailingMetadataToSend.add(key:"2", value:"two")
+            let (_, _) = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage),
+                                                     trailingMetadata:trailingMetadataToSend)
             self.log("------------------------------")
           }
         } else if (completionType == GRPC_QUEUE_TIMEOUT) {
@@ -248,7 +257,7 @@ class Document: NSDocument {
         if (response.status != 0) {
           break
         }
-        
+
         sleep(1)
       }
       self.log("Client Stopped")

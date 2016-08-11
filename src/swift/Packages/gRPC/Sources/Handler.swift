@@ -99,15 +99,9 @@ public class Handler {
   /// Receive the message sent with a call
   ///
   /// - Returns: a tuple containing status codes and a message (if available)
-  public func receiveMessage() -> (grpc_call_error, grpc_completion_type, ByteBuffer?) {
-
-    let initialMetadata = Metadata()
-    initialMetadata.add(key:"a", value:"Apple")
-    initialMetadata.add(key:"b", value:"Banana")
-    initialMetadata.add(key:"c", value:"Cherry")
+  public func receiveMessage(initialMetadata: Metadata) -> (grpc_call_error, grpc_completion_type, ByteBuffer?) {
 
     let operation_sendInitialMetadata = Operation_SendInitialMetadata(metadata:initialMetadata);
-
     let operation_receiveMessage = Operation_ReceiveMessage()
 
     let operations: [Operation] = [
@@ -133,18 +127,12 @@ public class Handler {
   ///
   /// - Parameter message: the message to send
   /// - Returns: a tuple containing status codes
-  public func sendResponse(message: ByteBuffer) -> (grpc_call_error, grpc_completion_type) {
+  public func sendResponse(message: ByteBuffer,
+                           trailingMetadata: Metadata) -> (grpc_call_error, grpc_completion_type) {
     let operation_receiveCloseOnServer = Operation_ReceiveCloseOnServer();
-
-    let trailingMetadata = Metadata()
-    trailingMetadata.add(key:"0", value:"zero")
-    trailingMetadata.add(key:"1", value:"one")
-    trailingMetadata.add(key:"2", value:"two")
-
     let operation_sendStatusFromServer = Operation_SendStatusFromServer(status:0,
                                                                         statusDetails:"wxyz",
                                                                         metadata:trailingMetadata)
-
     let operation_sendMessage = Operation_SendMessage(message:message)
 
     let operations: [Operation] = [
