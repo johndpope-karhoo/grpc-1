@@ -6,8 +6,6 @@
 //  Copyright © 2016 Google. All rights reserved.
 //
 
-import Foundation
-
 /// Representation of a response to a gRPC call 
 public class CallResponse {
 
