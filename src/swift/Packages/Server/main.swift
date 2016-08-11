@@ -16,12 +16,21 @@ do {
         print("INITIAL METADATA ->", initialMetadata.key(index:i), ":", initialMetadata.value(index:i))
       }
   
-      let (_, _, message) = requestHandler.receiveMessage()
+      let initialMetadataToSend = Metadata()
+      initialMetadataToSend.add(key:"a", value:"Apple")
+      initialMetadataToSend.add(key:"b", value:"Banana")
+      initialMetadataToSend.add(key:"c", value:"Cherry")
+      let (_, _, message) = requestHandler.receiveMessage(initialMetadata:initialMetadataToSend)
       print("MESSAGE", message!.string())
       if requestHandler.method() == "/quit" {
         running = false
       }
-      let (_, _) = requestHandler.sendResponse(message:ByteBuffer(string:"thank you very much!"))
+      let trailingMetadataToSend = Metadata()
+      trailingMetadataToSend.add(key:"0", value:"zero")
+      trailingMetadataToSend.add(key:"1", value:"one")
+      trailingMetadataToSend.add(key:"2", value:"two")
+      let (_, _) = requestHandler.sendResponse(message:ByteBuffer(string:"thank you very much!"),
+                                               trailingMetadata:trailingMetadataToSend)
     }
   }
 }
