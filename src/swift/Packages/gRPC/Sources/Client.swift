@@ -39,16 +39,16 @@ public class Client {
   /// Pointer to underlying C representation
   var c: UnsafeMutablePointer<Void>!
 
+  /// Completion queue for client call operations
+  var completionQueue: CompletionQueue
+
   public init(address: String) {
     c = grpcshim_client_create(address)
+    completionQueue = CompletionQueue(cq:grpcshim_client_completion_queue(c))
   }
 
   deinit {
     grpcshim_client_destroy(c)
-  }
-
-  func completionQueue() -> CompletionQueue {
-    return CompletionQueue(cq:grpcshim_client_completion_queue(c))
   }
 
   func createCall(method:String, host:String, timeout:Double) -> Call {
@@ -82,11 +82,13 @@ public class Client {
       operation_receiveMessage
     ]
 
-    let call = self.createCall(method:method, host:host, timeout:5)
-    let call_status = call.performOperations(completionQueue:self.completionQueue(),
-                                             operations:operations,
-                                             tag:111,
-                                             timeout:5)
+    let call = createCall(method:method, host:host, timeout:5.0)
+    let call_error = call.performOperations(operations:operations, tag:111)
+    if call_error != GRPC_CALL_OK {
+      return CallResponse(status:0, statusDetails:"", message:nil)
+    }
+
+    let call_status = completionQueue.waitForCompletion(timeout:5.0)
     if (call_status == GRPC_OP_COMPLETE) {
       let response = CallResponse(status:operation_receiveStatusOnClient.status(),
                                   statusDetails:operation_receiveStatusOnClient.statusDetails(),

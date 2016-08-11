@@ -59,9 +59,9 @@ void grpcshim_client_destroy(grpcshim_client *c) {
 }
 
 grpcshim_call *grpcshim_client_create_call(grpcshim_client *client,
-                                   const char *method,
-                                   const char *host,
-                                   double timeout) {
+                                           const char *method,
+                                           const char *host,
+                                           double timeout) {
   // create call
   gpr_timespec deadline = grpcshim_deadline_in_seconds_from_now(timeout);
   grpc_call *client_call = grpc_channel_create_call(client->client,

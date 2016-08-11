@@ -40,7 +40,7 @@ public class CompletionQueue {
   var cq : UnsafeMutablePointer<Void>!
 
   init(cq: UnsafeMutablePointer<Void>) {
-    self.cq = cq
+    self.cq = cq // NOT OWNED, so we don't dealloc it
   }
 
   func waitForCompletion(timeout: Double) -> grpc_completion_type {

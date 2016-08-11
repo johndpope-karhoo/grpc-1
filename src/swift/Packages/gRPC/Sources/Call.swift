@@ -34,21 +34,28 @@
   import CgRPC
 #endif
 
+/// Singleton class that provides a mutex for synchronizing calls to grpcshim_call_perform()
 private class CallLock {
-  var mutex : Mutex
+  private var mutex : Mutex
   init() {
     mutex = Mutex()
   }
   static let sharedInstance = CallLock()
 }
 
+/// Representation of a gRPC API call
 public class Call {
 
   /// Pointer to underlying C representation
-  var call : UnsafeMutablePointer<Void>!
+  private var call : UnsafeMutablePointer<Void>!
 
-  var owned : Bool
+  /// True if this instance is responsible for deleting the underlying C representation
+  private var owned : Bool
 
+  /// Initializes a Call representation
+  ///
+  /// - Parameter call: the underlying C representation
+  /// - Parameter owned: true if this instance is responsible for deleting the underlying call
   init(call: UnsafeMutablePointer<Void>, owned: Bool) {
     self.call = call
     self.owned = owned
@@ -60,18 +67,21 @@ public class Call {
     }
   }
 
-  func performOperations(completionQueue: CompletionQueue,
-                         operations: [Operation],
-                         tag: Int,
-                         timeout: Double) -> grpc_completion_type {
+  /// Performs a nonstreaming API call
+  ///
+  /// - Parameter operations: array of operations to be performed
+  /// - Parameter tag: integer tag that will be attached to these operations
+  /// - Returns: the result of preparing the call
+  func performOperations(operations: [Operation],
+                         tag: Int) -> grpc_call_error {
     grpcshim_call_reserve_space_for_operations(call, Int32(operations.count))
     for operation in operations {
       grpcshim_call_add_operation(call, operation.observer)
     }
     let mutex = CallLock.sharedInstance.mutex
     mutex.lock()
-    grpcshim_call_perform(call, tag)
+    let error = grpcshim_call_perform(call, tag)
     mutex.unlock()
-    return completionQueue.waitForCompletion(timeout:timeout)
+    return error
   }
 }

@@ -39,11 +39,15 @@ public class Handler {
   /// Pointer to underlying C representation
   var h: UnsafeMutablePointer<Void>!
 
+  /// Completion queue for handler response operations
+  var completionQueue: CompletionQueue
+
   public var requestMetadata: Metadata
 
   init(h:UnsafeMutablePointer<Void>!) {
     self.h = h;
     self.requestMetadata = Metadata()
+    self.completionQueue = CompletionQueue(cq:grpcshim_handler_get_completion_queue(h))
   }
 
   deinit {
@@ -66,10 +70,6 @@ public class Handler {
     return Call(call: grpcshim_handler_get_call(h), owned:false)
   }
 
-  func completionQueue() -> CompletionQueue {
-    return CompletionQueue(cq:grpcshim_handler_get_completion_queue(h));
-  }
-
   public func receiveMessage() -> (grpc_completion_type, ByteBuffer?) {
 
     let initialMetadata = Metadata()
@@ -87,10 +87,11 @@ public class Handler {
     ]
 
     let call = self.call()
-    let call_status = call.performOperations(completionQueue:self.completionQueue(),
-                                             operations:operations,
-                                             tag:222,
-                                             timeout:5)
+    let call_error = call.performOperations(operations:operations, tag:222)
+    if call_error != GRPC_CALL_OK {
+      return (GRPC_OP_COMPLETE, nil) // TODO: fix this response to indicate an error
+    }
+    let call_status = completionQueue.waitForCompletion(timeout:5.0)
     if (call_status == GRPC_OP_COMPLETE) {
       return (call_status, operation_receiveMessage.message())
     } else {
@@ -119,9 +120,12 @@ public class Handler {
     ]
 
     let call = self.call()
-    return call.performOperations(completionQueue:self.completionQueue(),
-                                  operations:operations,
-                                  tag:333,
-                                  timeout:5)
+    let call_error = call.performOperations(operations:operations, tag:333)
+    if call_error != GRPC_CALL_OK {
+      return GRPC_OP_COMPLETE // TODO: fix this response to indicate an error
+    }
+    let call_status = completionQueue.waitForCompletion(timeout:5.0)
+
+    return call_status
   }
 }
