@@ -42,6 +42,8 @@ public class ByteBuffer {
   var b: UnsafeMutablePointer<Void>
 
   /// Initializes a ByteBuffer
+  ///
+  /// - Parameter b: the underlying C representation
   init(b: UnsafeMutablePointer<Void>) {
     self.b = b
   }

@@ -34,15 +34,23 @@
   import CgRPC
 #endif
 
+/// A gRPC Completion Queue
 public class CompletionQueue {
 
   /// Pointer to underlying C representation
   var cq : UnsafeMutablePointer<Void>!
 
+  /// Initializes a CompletionQueue
+  ///
+  /// - Parameter cq: the underlying C representation
   init(cq: UnsafeMutablePointer<Void>) {
     self.cq = cq // NOT OWNED, so we don't dealloc it
   }
 
+  /// Waits for an event to complete
+  ///
+  /// - Parameter timeout: a timeout value in seconds
+  /// - Returns: a grpc_completion_type code indicating the result of waiting
   func waitForCompletion(timeout: Double) -> grpc_completion_type {
     return grpcshim_completion_queue_get_next_event(cq, timeout);
   }

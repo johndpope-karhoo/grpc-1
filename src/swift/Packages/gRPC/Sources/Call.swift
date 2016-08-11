@@ -43,7 +43,7 @@ private class CallLock {
   static let sharedInstance = CallLock()
 }
 
-/// Representation of a gRPC API call
+/// A gRPC API call
 public class Call {
 
   /// Pointer to underlying C representation
@@ -67,11 +67,11 @@ public class Call {
     }
   }
 
-  /// Performs a nonstreaming API call
+  /// Initiate performance of a call without waiting for completion
   ///
   /// - Parameter operations: array of operations to be performed
   /// - Parameter tag: integer tag that will be attached to these operations
-  /// - Returns: the result of preparing the call
+  /// - Returns: the result of initiating the call
   func performOperations(operations: [Operation], tag: Int) -> grpc_call_error {
     grpcshim_call_reserve_space_for_operations(call, Int32(operations.count))
     for operation in operations {

@@ -35,6 +35,7 @@
 #endif
 import Foundation // for String.Encoding
 
+/// An item of metadata
 public struct MetadataPair {
   public var key: String
   public var value: String
@@ -44,6 +45,7 @@ public struct MetadataPair {
   }
 }
 
+/// Metadata sent with gRPC messages
 public class Metadata {
 
   /// Pointer to underlying C representation
@@ -52,29 +54,36 @@ public class Metadata {
   init(array: UnsafeMutablePointer<Void>) {
     self.array = array
   }
+
   public init() {
     self.array = grpcshim_metadata_array_create();
   }
+
   public init(pairs: [MetadataPair]) {
     self.array = grpcshim_metadata_array_create();
     for pair in pairs {
       self.add(key:pair.key, value:pair.value)
     }
   }
+
   deinit {
     grpcshim_metadata_array_destroy(array);
   }
+
   public func count() -> Int {
     return grpcshim_metadata_array_get_count(array);
   }
+
   public func key(index: Int) -> (String) {
     return String(cString:grpcshim_metadata_array_get_key_at_index(array, index),
                   encoding:String.Encoding.utf8)!;
   }
+
   public func value(index: Int) -> (String) {
     return String(cString:grpcshim_metadata_array_get_value_at_index(array, index),
                   encoding:String.Encoding.utf8)!;
   }
+
   public func add(key:String, value:String) {
     grpcshim_metadata_array_append_metadata(array, key, value)
   }

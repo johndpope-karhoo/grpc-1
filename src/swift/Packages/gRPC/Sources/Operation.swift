@@ -35,6 +35,7 @@
 #endif
 import Foundation // for String.Encoding
 
+/// Abstract representation of gRPC Operations
 public class Operation {
 
   /// Pointer to underlying C representation
@@ -49,26 +50,34 @@ public class Operation {
   }
 }
 
+/// SendInitialMetadata operation
 class Operation_SendInitialMetadata : Operation {
+
   init(metadata:Metadata) {
     super.init(observer:grpcshim_observer_create_send_initial_metadata(metadata.array))
   }
 }
 
+/// SendMessage operation
 class Operation_SendMessage : Operation {
+
   init(message:ByteBuffer) {
     super.init(observer:grpcshim_observer_create_send_message())
     grpcshim_observer_send_message_set_message(observer, message.b);
   }
 }
 
+/// SendCloseFromClient operation
 class Operation_SendCloseFromClient : Operation {
+
   init() {
     super.init(observer:grpcshim_observer_create_send_close_from_client())
   }
 }
 
+/// SendStatusFrom Server operation
 class Operation_SendStatusFromServer : Operation {
+
   init(status:Int,
        statusDetails:String,
        metadata:Metadata) {
@@ -78,7 +87,9 @@ class Operation_SendStatusFromServer : Operation {
   }
 }
 
+/// ReceiveInitialMetadata operation
 class Operation_ReceiveInitialMetadata : Operation {
+
   init() {
     super.init(observer:grpcshim_observer_create_recv_initial_metadata())
   }
@@ -87,10 +98,13 @@ class Operation_ReceiveInitialMetadata : Operation {
   }
 }
 
+/// ReceiveMessage operation
 class Operation_ReceiveMessage : Operation {
+
   init() {
     super.init(observer:grpcshim_observer_create_recv_message())
   }
+
   func message() -> ByteBuffer? {
     if let b = grpcshim_observer_recv_message_get_message(observer) {
       return ByteBuffer(b:b)
@@ -100,22 +114,29 @@ class Operation_ReceiveMessage : Operation {
   }
 }
 
+/// ReceiveStatusOnClient operation
 class Operation_ReceiveStatusOnClient : Operation {
+
   init() {
     super.init(observer:grpcshim_observer_create_recv_status_on_client())
   }
+
   func metadata() -> Metadata {
     return Metadata(array:grpcshim_observer_recv_status_on_client_get_metadata(observer));
   }
+
   func status() -> Int {
     return grpcshim_observer_recv_status_on_client_status(observer);
   }
+
   func statusDetails() -> String {
     return String(cString:grpcshim_observer_recv_status_on_client_status_details(observer), encoding:String.Encoding.utf8)!
   }
 }
 
+/// ReceiveCloseOnServer operation
 class Operation_ReceiveCloseOnServer : Operation {
+
   init() {
     super.init(observer:grpcshim_observer_create_recv_close_on_server())
   }

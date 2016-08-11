@@ -35,6 +35,7 @@
 #endif
 import Foundation // for String.Encoding
 
+/// A gRPC request handler
 public class Handler {
   /// Pointer to underlying C representation
   var h: UnsafeMutablePointer<Void>!
@@ -42,8 +43,12 @@ public class Handler {
   /// Completion queue for handler response operations
   var completionQueue: CompletionQueue
 
+  /// Metadata received with the request
   public var requestMetadata: Metadata
 
+  /// Initializes a Handler
+  ///
+  /// - Parameter h: the underlying C representation
   init(h:UnsafeMutablePointer<Void>!) {
     self.h = h;
     self.requestMetadata = Metadata()
@@ -54,26 +59,46 @@ public class Handler {
     grpcshim_handler_destroy(self.h)
   }
 
+  /// Gets the host name sent with the request
+  ///
+  /// - Returns: the host name sent with the request
   public func host() -> String {
     return String(cString:grpcshim_handler_host(h), encoding:String.Encoding.utf8)!;
   }
 
+  /// Gets the method name sent with the request
+  ///
+  /// - Returns: the method name sent with the request
   public func method() -> String {
     return String(cString:grpcshim_handler_method(h), encoding:String.Encoding.utf8)!;
   }
 
+  /// Gets the caller identity associated with the request
+  ///
+  /// - Returns: a string representing the caller address
   public func caller() -> String {
     return String(cString:grpcshim_handler_call_peer(h), encoding:String.Encoding.utf8)!;
   }
 
+  /// Creates a call object associated with the handler
+  ///
+  /// - Returns: a Call object that can be used to respond to the request
   func call() -> Call {
     return Call(call: grpcshim_handler_get_call(h), owned:false)
   }
 
+  /// Request a call for the handler
+  ///
+  /// Fills the handler properties with information about the received request
+  /// 
+  /// - Returns: a grpc_call_error indicating the result of requesting the call
   func requestCall(tag: Int) -> grpc_call_error {
     return grpcshim_handler_request_call(h, requestMetadata.array, tag)
   }
 
+  /// Receive the message sent with a call
+  ///
+  /// - Returns: a tuple containing status codes and a message (if available)
   public func receiveMessage() -> (grpc_call_error, grpc_completion_type, ByteBuffer?) {
 
     let initialMetadata = Metadata()
@@ -104,6 +129,10 @@ public class Handler {
     }
   }
 
+  /// Sends the response to a request
+  ///
+  /// - Parameter message: the message to send
+  /// - Returns: a tuple containing status codes
   public func sendResponse(message: ByteBuffer) -> (grpc_call_error, grpc_completion_type) {
     let operation_receiveCloseOnServer = Operation_ReceiveCloseOnServer();
 

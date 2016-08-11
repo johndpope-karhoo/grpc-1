@@ -35,14 +35,19 @@
 #endif
 import Foundation // for String.Encoding
 
+/// Initializes gRPC system
 public func initialize() {
   grpc_init()
 }
 
+/// Shuts down gRPC system
 public func shutdown() {
   grpc_shutdown()
 }
 
+/// Returns version of underlying gRPC library
+///
+/// Returns: gRPC version string
 public func version() -> String {
   return String(cString:grpc_version_string(), encoding:String.Encoding.utf8)!
 }

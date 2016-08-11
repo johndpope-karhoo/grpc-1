@@ -34,13 +34,18 @@
   import CgRPC
 #endif
 
+/// gRPC Server
 public class Server {
 
   /// Pointer to underlying C representation
   var s: UnsafeMutablePointer<Void>!
 
+  /// Completion queue used for server operations
   var completionQueue: CompletionQueue
 
+  /// Initializes a Server
+  ///
+  /// - Parameter address: the address where the server will listen
   public init(address:String) {
     s = grpcshim_server_create(address)
     completionQueue = CompletionQueue(cq:grpcshim_server_get_completion_queue(s))
@@ -50,10 +55,14 @@ public class Server {
     grpcshim_server_destroy(s)
   }
 
+  /// Starts the server
   public func start() {
     grpcshim_server_start(s);
   }
 
+  /// Gets the next request sent to the server
+  ///
+  /// - Returns: a tuple containing the results of waiting and a possible Handler for the request
   public func getNextRequest(timeout: Double) -> (grpc_call_error, grpc_completion_type, Handler?) {
     let handler = Handler(h:grpcshim_handler_create_with_server(s))
     let call_error = handler.requestCall(tag:101)

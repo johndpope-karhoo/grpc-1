@@ -39,30 +39,28 @@
 #include <grpc/impl/codegen/alloc.h>
 
 typedef struct {
-  grpc_call *call;
-  grpc_op *ops;
+  grpc_call *call; // owned
+  grpc_op *ops; // owned
   int ops_count;
 } grpcshim_call;
 
 typedef struct {
-  grpc_channel *client;
-  grpc_completion_queue *completion_queue;
+  grpc_channel *client; // owned
+  grpc_completion_queue *completion_queue; // owned
 } grpcshim_client;
 
 typedef struct {
-  grpc_server *server;
-  grpc_completion_queue *completion_queue;
+  grpc_server *server; // owned
+  grpc_completion_queue *completion_queue; // owned
   int port;
 } grpcshim_server;
 
 typedef struct {
-  grpcshim_server *server;
-  grpc_completion_queue *completion_queue;
-
+  grpcshim_server *server; // reference
+  grpc_completion_queue *completion_queue; // owned; handlers have dedicated completion queues
   grpc_metadata_array request_metadata_recv;
   grpc_call_details call_details;
-  grpc_call *server_call; // session
-
+  grpc_call *server_call; // owned
 } grpcshim_handler;
 
 typedef grpc_byte_buffer grpcshim_byte_buffer;

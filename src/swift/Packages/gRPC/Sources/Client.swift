@@ -34,6 +34,7 @@
   import CgRPC
 #endif
 
+/// A gRPC Client
 public class Client {
 
   /// Pointer to underlying C representation
@@ -42,6 +43,9 @@ public class Client {
   /// Completion queue for client call operations
   var completionQueue: CompletionQueue
 
+  /// Initializes a gRPC client
+  ///
+  /// - Parameter address: the address of the server to be called
   public init(address: String) {
     c = grpcshim_client_create(address)
     completionQueue = CompletionQueue(cq:grpcshim_client_completion_queue(c))
@@ -51,26 +55,34 @@ public class Client {
     grpcshim_client_destroy(c)
   }
 
-  func createCall(method:String, host:String, timeout:Double) -> Call {
+  /// Constructs a Call object to make a gRPC API call
+  ///
+  /// - Parameter host: the gRPC host name for the call
+  /// - Parameter method: the gRPC method name for the call
+  /// - Parameter timeout: a timeout value in seconds
+  /// - Returns: a Call object that can be used to make the request
+  func createCall(host:String, method:String, timeout:Double) -> Call {
     let call = grpcshim_client_create_call(c, method, host, timeout)!
     return Call(call:call, owned:true)
   }
 
+  /// Performs a nonstreaming gRPC API call
+  ///
+  /// - Parameter host: the gRPC host name for the call
+  /// - Parameter method: the gRPC method name for the call
+  /// - Parameter message: a ByteBuffer containing the message to send
+  /// - Parameter metadata: metadata to send with the call
+  /// - Returns: a CallResponse object containing results of the call
   public func performRequest(host: String,
                              method: String,
                              message: ByteBuffer,
                              metadata: Metadata) -> CallResponse  {
 
     let operation_sendInitialMetadata = Operation_SendInitialMetadata(metadata:metadata);
-
     let operation_sendMessage = Operation_SendMessage(message:message)
-
     let operation_sendCloseFromClient = Operation_SendCloseFromClient()
-
     let operation_receiveInitialMetadata = Operation_ReceiveInitialMetadata()
-
     let operation_receiveStatusOnClient = Operation_ReceiveStatusOnClient()
-
     let operation_receiveMessage = Operation_ReceiveMessage()
 
     let operations: [Operation] = [
@@ -82,7 +94,7 @@ public class Client {
       operation_receiveMessage
     ]
 
-    let call = createCall(method:method, host:host, timeout:5.0)
+    let call = createCall(host:host, method:method, timeout:5.0)
     let call_error = call.performOperations(operations:operations, tag:111)
     if call_error != GRPC_CALL_OK {
       return CallResponse(error: call_error)
@@ -92,9 +104,9 @@ public class Client {
     if (call_status == GRPC_OP_COMPLETE) {
       let response = CallResponse(status:operation_receiveStatusOnClient.status(),
                                   statusDetails:operation_receiveStatusOnClient.statusDetails(),
-                                  message:operation_receiveMessage.message())
-      response.initialMetadata = operation_receiveInitialMetadata.metadata();
-      response.trailingMetadata = operation_receiveStatusOnClient.metadata();
+                                  message:operation_receiveMessage.message(),
+                                  initialMetadata:operation_receiveInitialMetadata.metadata(),
+                                  trailingMetadata:operation_receiveStatusOnClient.metadata())
       return response
     } else {
       return CallResponse(completion: call_status)
