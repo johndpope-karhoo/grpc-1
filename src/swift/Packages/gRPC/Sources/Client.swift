@@ -85,7 +85,7 @@ public class Client {
     let call = createCall(method:method, host:host, timeout:5.0)
     let call_error = call.performOperations(operations:operations, tag:111)
     if call_error != GRPC_CALL_OK {
-      return CallResponse(status:0, statusDetails:"", message:nil)
+      return CallResponse(error: call_error)
     }
 
     let call_status = completionQueue.waitForCompletion(timeout:5.0)
@@ -97,7 +97,7 @@ public class Client {
       response.trailingMetadata = operation_receiveStatusOnClient.metadata();
       return response
     } else {
-      return CallResponse(status:0, statusDetails:"", message:nil)
+      return CallResponse(completion: call_status)
     }
   }
 }
