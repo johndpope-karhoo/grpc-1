@@ -31,7 +31,7 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 class CallLock {
@@ -43,7 +43,10 @@ class CallLock {
 }
 
 public class Call {
+
+  /// Pointer to underlying C representation
   var call : UnsafeMutablePointer<Void>!
+
   var owned : Bool
 
   init(call: UnsafeMutablePointer<Void>, owned: Bool) {

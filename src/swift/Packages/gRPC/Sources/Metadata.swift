@@ -31,7 +31,7 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 public struct MetadataPair {
@@ -44,7 +44,10 @@ public struct MetadataPair {
 }
 
 public class Metadata {
+
+  /// Pointer to underlying C representation
   var array: UnsafeMutablePointer<Void>
+
   init(array: UnsafeMutablePointer<Void>) {
     self.array = array
   }

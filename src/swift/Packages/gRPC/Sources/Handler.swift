@@ -31,11 +31,13 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 public class Handler {
+  /// Pointer to underlying C representation
   var h: UnsafeMutablePointer<Void>!
+
   public var requestMetadata: Metadata
 
   init(h:UnsafeMutablePointer<Void>!) {
@@ -73,7 +75,7 @@ public class Handler {
     initialMetadata.add(key:"a", value:"Apple")
     initialMetadata.add(key:"b", value:"Banana")
     initialMetadata.add(key:"c", value:"Cherry")
-    
+
     let operation_sendInitialMetadata = Operation_SendInitialMetadata(metadata:initialMetadata);
 
     let operation_receiveMessage = Operation_ReceiveMessage()

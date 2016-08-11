@@ -31,14 +31,18 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 public class Operation {
+
+  /// Pointer to underlying C representation
   var observer: UnsafeMutablePointer<Void>
+
   init(observer: UnsafeMutablePointer<Void>) {
     self.observer = observer
   }
+
   deinit {
     grpcshim_observer_destroy(observer);
   }

@@ -13,9 +13,12 @@ import Foundation
 #endif
 
 public class Mutex {
-  var mu: UnsafeMutablePointer<Void>!
 
-  init() {
+  /// Pointer to underlying C representation
+  private var mu: UnsafeMutablePointer<Void>!
+
+  /// Initializes a Mutex
+  public init() {
     mu = grpcshim_mutex_create();
   }
 
@@ -23,11 +26,21 @@ public class Mutex {
     grpcshim_mutex_destroy(mu);
   }
 
-  func lock() {
+  /// Locks a Mutex
+  ///
+  /// Waits until no thread has a lock on the Mutex, 
+  /// causes the calling thread to own an exclusive lock on the Mutex,
+  /// then returns. 
+  ///
+  /// May block indefinitely or crash if the calling thread has a lock on the Mutex.
+  public func lock() {
     grpcshim_mutex_lock(mu);
   }
 
-  func unlock() {
+  /// Unlocks a Mutex
+  ///
+  /// Releases an exclusive lock on the Mutex held by the calling thread.
+  public func unlock() {
     grpcshim_mutex_unlock(mu);
   }
 }

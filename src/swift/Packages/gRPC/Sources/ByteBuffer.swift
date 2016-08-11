@@ -31,18 +31,25 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 import Foundation
 
+/// Representation of raw data that may be sent and received using gRPC
 public class ByteBuffer {
+
+  /// Pointer to underlying C representation
   var b: UnsafeMutablePointer<Void>
 
+  /// Initializes a ByteBuffer
   init(b: UnsafeMutablePointer<Void>) {
     self.b = b
   }
 
+  /// Initializes a ByteBuffer
+  ///
+  /// - Parameter string: a string to store in the buffer
   public init(string: String) {
     self.b = grpcshim_byte_buffer_create_with_string(string)
   }
@@ -51,8 +58,11 @@ public class ByteBuffer {
     grpcshim_byte_buffer_destroy(b);
   }
 
+  /// Gets a string from the contents of the ByteBuffer
+  ///
+  /// - Returns: a string formed from the ByteBuffer contents
   public func string() -> String {
     return String(cString:grpcshim_byte_buffer_as_string(b),
-                  encoding: String.Encoding.utf8)!
+                  encoding:String.Encoding.utf8)!
   }
 }

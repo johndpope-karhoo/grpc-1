@@ -45,18 +45,24 @@ void grpcshim_byte_buffer_destroy(grpcshim_byte_buffer *bb) {
 
 grpcshim_byte_buffer *grpcshim_byte_buffer_create_with_string(const char *string) {
   gpr_slice request_payload_slice = gpr_slice_from_copied_string(string);
-  return grpc_raw_byte_buffer_create(&request_payload_slice, 1);
+  grpcshim_byte_buffer *bb = grpc_raw_byte_buffer_create(&request_payload_slice, 1);
+  gpr_slice_unref(request_payload_slice);
+  return bb;
 }
 
 const char *grpcshim_byte_buffer_as_string(grpc_byte_buffer *bb) {
   if (!bb) {
-    return "NULL";
+    return "";
   }
   grpc_byte_buffer_reader reader;
-  assert(grpc_byte_buffer_reader_init(&reader, bb) && "Couldn't init byte buffer reader");
-
+  bool success = grpc_byte_buffer_reader_init(&reader, bb);
+  if (!success) {
+    return "";
+  }
   gpr_slice slice = grpc_byte_buffer_reader_readall(&reader);
-
-  return strndup((const char *) GPR_SLICE_START_PTR(slice),
-                 (size_t) GPR_SLICE_LENGTH(slice));
+  const char *result = strndup((const char *) GPR_SLICE_START_PTR(slice),
+                               (size_t) GPR_SLICE_LENGTH(slice));
+  gpr_slice_unref(slice);
+  grpc_byte_buffer_reader_destroy(&reader);
+  return result;
 }

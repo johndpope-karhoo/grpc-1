@@ -31,10 +31,12 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 public class Client {
+
+  /// Pointer to underlying C representation
   var c: UnsafeMutablePointer<Void>!
 
   public init(address: String) {

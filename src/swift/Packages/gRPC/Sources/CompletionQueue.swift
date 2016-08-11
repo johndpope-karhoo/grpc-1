@@ -31,11 +31,14 @@
  *
  */
 #if SWIFT_PACKAGE
-import CgRPC
+  import CgRPC
 #endif
 
 public class CompletionQueue {
+
+  /// Pointer to underlying C representation
   var cq : UnsafeMutablePointer<Void>!
+
   init(cq: UnsafeMutablePointer<Void>) {
     self.cq = cq
   }

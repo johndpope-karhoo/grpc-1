@@ -35,6 +35,8 @@
 #endif
 
 public class Server {
+
+  /// Pointer to underlying C representation
   var s: UnsafeMutablePointer<Void>!
 
   public init(address:String) {
