@@ -16,12 +16,12 @@ do {
         print("INITIAL METADATA ->", initialMetadata.key(index:i), ":", initialMetadata.value(index:i))
       }
   
-      let (_, message) = requestHandler.receiveMessage()
+      let (_, _, message) = requestHandler.receiveMessage()
       print("MESSAGE", message!.string())
       if requestHandler.method() == "/quit" {
         running = false
       }
-      let _ = requestHandler.sendResponse(message:ByteBuffer(string:"thank you very much!"))
+      let (_, _) = requestHandler.sendResponse(message:ByteBuffer(string:"thank you very much!"))
     }
   }
 }
