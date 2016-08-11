@@ -99,17 +99,3 @@ public class Client {
     }
   }
 }
-
-public class CallResponse {
-  public var status: Int
-  public var statusDetails: String
-  public var message: ByteBuffer?
-  public var initialMetadata: Metadata?
-  public var trailingMetadata: Metadata?
-
-  init(status:Int, statusDetails:String, message:ByteBuffer?) {
-    self.status = status
-    self.statusDetails = statusDetails
-    self.message = message
-  }
-}

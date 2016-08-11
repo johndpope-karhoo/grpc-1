@@ -34,7 +34,7 @@
   import CgRPC
 #endif
 
-class CallLock {
+private class CallLock {
   var mutex : Mutex
   init() {
     mutex = Mutex()

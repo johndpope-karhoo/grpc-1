@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D32F10121D5CEE880071B7C1 /* CallResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32F10111D5CEE880071B7C1 /* CallResponse.swift */; };
 		D3AC86AE1D5BEBBE0042B341 /* byte_buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AC86A21D5BEBBE0042B341 /* byte_buffer.c */; };
 		D3AC86AF1D5BEBBE0042B341 /* call.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AC86A31D5BEBBE0042B341 /* call.c */; };
 		D3AC86B01D5BEBBE0042B341 /* client.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AC86A41D5BEBBE0042B341 /* client.c */; };
@@ -34,6 +35,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D32F10111D5CEE880071B7C1 /* CallResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CallResponse.swift; path = Packages/gRPC/Sources/CallResponse.swift; sourceTree = "<group>"; };
 		D3AC86A21D5BEBBE0042B341 /* byte_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = byte_buffer.c; path = Packages/CgRPC/Sources/byte_buffer.c; sourceTree = "<group>"; };
 		D3AC86A31D5BEBBE0042B341 /* call.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = call.c; path = Packages/CgRPC/Sources/call.c; sourceTree = "<group>"; };
 		D3AC86A41D5BEBBE0042B341 /* client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = client.c; path = Packages/CgRPC/Sources/client.c; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 			children = (
 				D3AC86BB1D5BEBE00042B341 /* ByteBuffer.swift */,
 				D3AC86BC1D5BEBE00042B341 /* Call.swift */,
+				D32F10111D5CEE880071B7C1 /* CallResponse.swift */,
 				D3AC86BD1D5BEBE00042B341 /* Client.swift */,
 				D3AC86BE1D5BEBE00042B341 /* CompletionQueue.swift */,
 				D3AC86BF1D5BEBE00042B341 /* gRPC.swift */,
@@ -240,6 +243,7 @@
 				D3AC86CA1D5BEBE00042B341 /* Handler.swift in Sources */,
 				D3AC86CD1D5BEBE00042B341 /* Operation.swift in Sources */,
 				D3AC86B71D5BEBBE0042B341 /* observers.c in Sources */,
+				D32F10121D5CEE880071B7C1 /* CallResponse.swift in Sources */,
 				D3AC86CE1D5BEBE00042B341 /* Server.swift in Sources */,
 				D3AC86B61D5BEBBE0042B341 /* mutex.c in Sources */,
 				D3AC86C71D5BEBE00042B341 /* Client.swift in Sources */,
