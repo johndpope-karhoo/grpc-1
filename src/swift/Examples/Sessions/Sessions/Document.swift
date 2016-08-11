@@ -179,7 +179,7 @@ class Document: NSDocument {
               self.log("\(requestCount): Received initial metadata -> " + initialMetadata.key(index:i) + ":" + initialMetadata.value(index:i))
             }
 
-            let (_, message) = requestHandler.receiveMessage()
+            let (_, _, message) = requestHandler.receiveMessage()
             if let message = message {
               self.log("\(requestCount): Received message: " + message.string())
             }
@@ -187,7 +187,7 @@ class Document: NSDocument {
               self.stop()
             }
             let replyMessage = "thank you very much!"
-            let _ = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage))
+            let (_, _) = requestHandler.sendResponse(message:ByteBuffer(string:replyMessage))
             self.log("------------------------------")
           }
         } else if (completionType == GRPC_QUEUE_TIMEOUT) {

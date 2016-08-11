@@ -74,7 +74,7 @@ public class Handler {
     return grpcshim_handler_request_call(h, requestMetadata.array, tag)
   }
 
-  public func receiveMessage() -> (grpc_completion_type, ByteBuffer?) {
+  public func receiveMessage() -> (grpc_call_error, grpc_completion_type, ByteBuffer?) {
 
     let initialMetadata = Metadata()
     initialMetadata.add(key:"a", value:"Apple")
@@ -93,17 +93,18 @@ public class Handler {
     let call = self.call()
     let call_error = call.performOperations(operations:operations, tag:222)
     if call_error != GRPC_CALL_OK {
-      return (GRPC_OP_COMPLETE, nil) // TODO: fix this response to indicate an error
+      return (call_error, GRPC_OP_COMPLETE, nil)
     }
+
     let call_status = completionQueue.waitForCompletion(timeout:5.0)
     if (call_status == GRPC_OP_COMPLETE) {
-      return (call_status, operation_receiveMessage.message())
+      return (GRPC_CALL_OK, GRPC_OP_COMPLETE, operation_receiveMessage.message())
     } else {
-      return (call_status, nil)
+      return (GRPC_CALL_OK, call_status, nil)
     }
   }
 
-  public func sendResponse(message: ByteBuffer) -> grpc_completion_type {
+  public func sendResponse(message: ByteBuffer) -> (grpc_call_error, grpc_completion_type) {
     let operation_receiveCloseOnServer = Operation_ReceiveCloseOnServer();
 
     let trailingMetadata = Metadata()
@@ -126,10 +127,9 @@ public class Handler {
     let call = self.call()
     let call_error = call.performOperations(operations:operations, tag:333)
     if call_error != GRPC_CALL_OK {
-      return GRPC_OP_COMPLETE // TODO: fix this response to indicate an error
+      return (call_error, GRPC_OP_COMPLETE)
     }
     let call_status = completionQueue.waitForCompletion(timeout:5.0)
-
-    return call_status
+    return (GRPC_CALL_OK, call_status)
   }
 }
