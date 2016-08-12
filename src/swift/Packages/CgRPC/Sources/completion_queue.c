@@ -31,20 +31,20 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include <stdio.h>
 
-grpc_completion_type grpcshim_completion_queue_get_next_event(grpc_completion_queue *cq,
+grpc_completion_type cgrpc_completion_queue_get_next_event(grpc_completion_queue *cq,
                                                               double timeout) {
-  gpr_timespec deadline = grpcshim_deadline_in_seconds_from_now(timeout);
+  gpr_timespec deadline = cgrpc_deadline_in_seconds_from_now(timeout);
   grpc_event ev = grpc_completion_queue_next(cq, deadline, NULL);
   return ev.type;
 }
 
-void grpcshim_completion_queue_drain(grpc_completion_queue *cq) {
+void cgrpc_completion_queue_drain(grpc_completion_queue *cq) {
   grpc_event ev;
   do {
-    ev = grpc_completion_queue_next(cq, grpcshim_deadline_in_seconds_from_now(5), NULL);
+    ev = grpc_completion_queue_next(cq, cgrpc_deadline_in_seconds_from_now(5), NULL);
   } while (ev.type != GRPC_QUEUE_SHUTDOWN);
 }

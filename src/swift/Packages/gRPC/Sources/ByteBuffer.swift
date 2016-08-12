@@ -52,18 +52,18 @@ public class ByteBuffer {
   ///
   /// - Parameter string: a string to store in the buffer
   public init(string: String) {
-    self.b = grpcshim_byte_buffer_create_with_string(string)
+    self.b = cgrpc_byte_buffer_create_with_string(string)
   }
 
   deinit {
-    grpcshim_byte_buffer_destroy(b);
+    cgrpc_byte_buffer_destroy(b);
   }
 
   /// Gets a string from the contents of the ByteBuffer
   ///
   /// - Returns: a string formed from the ByteBuffer contents
   public func string() -> String {
-    return String(cString:grpcshim_byte_buffer_as_string(b),
+    return String(cString:cgrpc_byte_buffer_as_string(b),
                   encoding:String.Encoding.utf8)!
   }
 }

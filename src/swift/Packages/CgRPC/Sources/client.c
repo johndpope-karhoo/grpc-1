@@ -31,15 +31,15 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-grpcshim_client *grpcshim_client_create(const char *address) {
-  grpcshim_client *c = (grpcshim_client *) malloc(sizeof (grpcshim_client));
+cgrpc_client *cgrpc_client_create(const char *address) {
+  cgrpc_client *c = (cgrpc_client *) malloc(sizeof (cgrpc_client));
   // create the client
   grpc_channel_args client_args;
   client_args.num_args = 0;
@@ -48,22 +48,22 @@ grpcshim_client *grpcshim_client_create(const char *address) {
   return c;
 }
 
-void grpcshim_client_destroy(grpcshim_client *c) {
+void cgrpc_client_destroy(cgrpc_client *c) {
   grpc_channel_destroy(c->client);
   c->client = NULL;
 
   grpc_completion_queue_shutdown(c->completion_queue);
-  grpcshim_completion_queue_drain(c->completion_queue);
+  cgrpc_completion_queue_drain(c->completion_queue);
   grpc_completion_queue_destroy(c->completion_queue);
   free(c);
 }
 
-grpcshim_call *grpcshim_client_create_call(grpcshim_client *client,
+cgrpc_call *cgrpc_client_create_call(cgrpc_client *client,
                                            const char *method,
                                            const char *host,
                                            double timeout) {
   // create call
-  gpr_timespec deadline = grpcshim_deadline_in_seconds_from_now(timeout);
+  gpr_timespec deadline = cgrpc_deadline_in_seconds_from_now(timeout);
   grpc_call *client_call = grpc_channel_create_call(client->client,
                                                     NULL,
                                                     GRPC_PROPAGATE_DEFAULTS,
@@ -72,12 +72,12 @@ grpcshim_call *grpcshim_client_create_call(grpcshim_client *client,
                                                     host,
                                                     deadline,
                                                     NULL);
-  grpcshim_call *call = (grpcshim_call *) malloc(sizeof(grpcshim_call));
-  memset(call, 0, sizeof(grpcshim_call));
+  cgrpc_call *call = (cgrpc_call *) malloc(sizeof(cgrpc_call));
+  memset(call, 0, sizeof(cgrpc_call));
   call->call = client_call;
   return call;
 }
 
-grpcshim_completion_queue *grpcshim_client_completion_queue(grpcshim_client *client) {
+cgrpc_completion_queue *cgrpc_client_completion_queue(cgrpc_client *client) {
   return client->completion_queue;
 }

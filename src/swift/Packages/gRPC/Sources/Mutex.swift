@@ -42,11 +42,11 @@ public class Mutex {
 
   /// Initializes a Mutex
   public init() {
-    mu = grpcshim_mutex_create();
+    mu = cgrpc_mutex_create();
   }
 
   deinit {
-    grpcshim_mutex_destroy(mu);
+    cgrpc_mutex_destroy(mu);
   }
 
   /// Locks a Mutex
@@ -57,13 +57,13 @@ public class Mutex {
   ///
   /// May block indefinitely or crash if the calling thread has a lock on the Mutex.
   public func lock() {
-    grpcshim_mutex_lock(mu);
+    cgrpc_mutex_lock(mu);
   }
 
   /// Unlocks a Mutex
   ///
   /// Releases an exclusive lock on the Mutex held by the calling thread.
   public func unlock() {
-    grpcshim_mutex_unlock(mu);
+    cgrpc_mutex_unlock(mu);
   }
 }

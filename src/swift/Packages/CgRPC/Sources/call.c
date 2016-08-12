@@ -31,34 +31,34 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
-void grpcshim_call_destroy(grpcshim_call *call) {
+void cgrpc_call_destroy(cgrpc_call *call) {
   grpc_call_destroy(call->call);
   free(call);
 }
 
-void grpcshim_call_reserve_space_for_operations(grpcshim_call *call, int max_operations) {
+void cgrpc_call_reserve_space_for_operations(cgrpc_call *call, int max_operations) {
   call->ops = (grpc_op *) malloc(max_operations * sizeof(grpc_op));
   memset(call->ops, 0, max_operations * sizeof(grpc_op));
   call->ops_count = 0;
 }
 
-void grpcshim_call_add_operation(grpcshim_call *call, grpcshim_observer *observer) {
+void cgrpc_call_add_operation(cgrpc_call *call, cgrpc_observer *observer) {
   grpc_op *op = &(call->ops[call->ops_count]);
-  grpcshim_observer_apply(observer, op);
+  cgrpc_observer_apply(observer, op);
   call->ops_count++;
 }
 
-grpc_call_error grpcshim_call_perform(grpcshim_call *call, long tag) {
+grpc_call_error cgrpc_call_perform(cgrpc_call *call, long tag) {
   grpc_call_error error = grpc_call_start_batch(call->call,
                                call->ops,
                                call->ops_count,
-                               grpcshim_create_tag(tag),
+                               cgrpc_create_tag(tag),
                                NULL);
   return error;
 }

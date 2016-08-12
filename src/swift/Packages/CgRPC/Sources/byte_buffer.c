@@ -33,24 +33,24 @@
 #include <stdio.h>
 
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 
-void grpcshim_byte_buffer_destroy(grpcshim_byte_buffer *bb) {
+void cgrpc_byte_buffer_destroy(cgrpc_byte_buffer *bb) {
   grpc_byte_buffer_destroy(bb);
 }
 
-grpcshim_byte_buffer *grpcshim_byte_buffer_create_with_string(const char *string) {
+cgrpc_byte_buffer *cgrpc_byte_buffer_create_with_string(const char *string) {
   gpr_slice request_payload_slice = gpr_slice_from_copied_string(string);
-  grpcshim_byte_buffer *bb = grpc_raw_byte_buffer_create(&request_payload_slice, 1);
+  cgrpc_byte_buffer *bb = grpc_raw_byte_buffer_create(&request_payload_slice, 1);
   gpr_slice_unref(request_payload_slice);
   return bb;
 }
 
-const char *grpcshim_byte_buffer_as_string(grpc_byte_buffer *bb) {
+const char *cgrpc_byte_buffer_as_string(grpc_byte_buffer *bb) {
   if (!bb) {
     return "";
   }

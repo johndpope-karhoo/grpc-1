@@ -52,6 +52,6 @@ public class CompletionQueue {
   /// - Parameter timeout: a timeout value in seconds
   /// - Returns: a grpc_completion_type code indicating the result of waiting
   func waitForCompletion(timeout: Double) -> grpc_completion_type {
-    return grpcshim_completion_queue_get_next_event(cq, timeout);
+    return cgrpc_completion_queue_get_next_event(cq, timeout);
   }
 }

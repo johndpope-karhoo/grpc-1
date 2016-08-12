@@ -30,8 +30,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef grpcshim_internal_h
-#define grpcshim_internal_h
+#ifndef cgrpc_internal_h
+#define cgrpc_internal_h
 
 #include <grpc/grpc.h>
 #include <grpc/grpc_security.h>
@@ -42,69 +42,69 @@ typedef struct {
   grpc_call *call; // owned
   grpc_op *ops; // owned
   int ops_count;
-} grpcshim_call;
+} cgrpc_call;
 
 typedef struct {
   grpc_channel *client; // owned
   grpc_completion_queue *completion_queue; // owned
-} grpcshim_client;
+} cgrpc_client;
 
 typedef struct {
   grpc_server *server; // owned
   grpc_completion_queue *completion_queue; // owned
   int port;
-} grpcshim_server;
+} cgrpc_server;
 
 typedef struct {
-  grpcshim_server *server; // reference
+  cgrpc_server *server; // reference
   grpc_completion_queue *completion_queue; // owned; handlers have dedicated completion queues
   grpc_metadata_array request_metadata_recv;
   grpc_call_details call_details;
   grpc_call *server_call; // owned
-} grpcshim_handler;
+} cgrpc_handler;
 
-typedef grpc_byte_buffer grpcshim_byte_buffer;
-typedef grpc_completion_queue grpcshim_completion_queue;
-typedef grpc_metadata grpcshim_metadata;
-typedef grpc_metadata_array grpcshim_metadata_array;
-typedef gpr_mu grpcshim_mutex;
+typedef grpc_byte_buffer cgrpc_byte_buffer;
+typedef grpc_completion_queue cgrpc_completion_queue;
+typedef grpc_metadata cgrpc_metadata;
+typedef grpc_metadata_array cgrpc_metadata_array;
+typedef gpr_mu cgrpc_mutex;
 
 // OPERATIONS
 
 typedef struct {
   grpc_op_type op_type;
-} grpcshim_observer;
+} cgrpc_observer;
 
 typedef struct {
   grpc_op_type op_type;
   grpc_metadata_array initial_metadata;
-} grpcshim_observer_send_initial_metadata;
+} cgrpc_observer_send_initial_metadata;
 
 typedef struct {
   grpc_op_type op_type;
   grpc_byte_buffer *request_payload;
-} grpcshim_observer_send_message;
+} cgrpc_observer_send_message;
 
 typedef struct {
   grpc_op_type op_type;
-} grpcshim_observer_send_close_from_client;
+} cgrpc_observer_send_close_from_client;
 
 typedef struct {
   grpc_op_type op_type;
   grpc_metadata_array trailing_metadata;
   grpc_status_code status;
   char *status_details;
-} grpcshim_observer_send_status_from_server;
+} cgrpc_observer_send_status_from_server;
 
 typedef struct {
   grpc_op_type op_type;
   grpc_metadata_array initial_metadata_recv;
-} grpcshim_observer_recv_initial_metadata;
+} cgrpc_observer_recv_initial_metadata;
 
 typedef struct {
   grpc_op_type op_type;
   grpc_byte_buffer *response_payload_recv;
-} grpcshim_observer_recv_message;
+} cgrpc_observer_recv_message;
 
 typedef struct {
   grpc_op_type op_type;
@@ -112,17 +112,17 @@ typedef struct {
   grpc_status_code server_status;
   char *server_details;
   size_t server_details_capacity;
-} grpcshim_observer_recv_status_on_client;
+} cgrpc_observer_recv_status_on_client;
 
 typedef struct {
   grpc_op_type op_type;
   int was_cancelled;
-} grpcshim_observer_recv_close_on_server;
+} cgrpc_observer_recv_close_on_server;
 
 // internal utilities
-void *grpcshim_create_tag(intptr_t t);
-gpr_timespec grpcshim_deadline_in_seconds_from_now(float seconds);
+void *cgrpc_create_tag(intptr_t t);
+gpr_timespec cgrpc_deadline_in_seconds_from_now(float seconds);
 
-void grpcshim_observer_apply(grpcshim_observer *observer, grpc_op *op);
+void cgrpc_observer_apply(cgrpc_observer *observer, grpc_op *op);
 
-#endif /* grpcshim_internal_h */
+#endif /* cgrpc_internal_h */

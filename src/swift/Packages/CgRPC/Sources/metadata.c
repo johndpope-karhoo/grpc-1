@@ -31,35 +31,35 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include "stdlib.h"
 #include "string.h"
 
-grpcshim_metadata_array *grpcshim_metadata_array_create() {
-  grpcshim_metadata_array *metadata = (grpcshim_metadata_array *) malloc(sizeof(grpcshim_metadata_array));
-  memset(metadata, 0, sizeof(grpcshim_metadata_array));
+cgrpc_metadata_array *cgrpc_metadata_array_create() {
+  cgrpc_metadata_array *metadata = (cgrpc_metadata_array *) malloc(sizeof(cgrpc_metadata_array));
+  memset(metadata, 0, sizeof(cgrpc_metadata_array));
   return metadata;
 }
 
-void grpcshim_metadata_array_destroy(grpcshim_metadata_array *array) {
+void cgrpc_metadata_array_destroy(cgrpc_metadata_array *array) {
   grpc_metadata_array_destroy(array);
 }
 
-size_t grpcshim_metadata_array_get_count(grpcshim_metadata_array *array) {
+size_t cgrpc_metadata_array_get_count(cgrpc_metadata_array *array) {
   return array->count;
 }
 
-const char *grpcshim_metadata_array_get_key_at_index(grpcshim_metadata_array *array, size_t index) {
+const char *cgrpc_metadata_array_get_key_at_index(cgrpc_metadata_array *array, size_t index) {
   return array->metadata[index].key;
 }
 
-const char *grpcshim_metadata_array_get_value_at_index(grpcshim_metadata_array *array, size_t index) {
+const char *cgrpc_metadata_array_get_value_at_index(cgrpc_metadata_array *array, size_t index) {
   return array->metadata[index].value;
 }
 
-void grpcshim_metadata_array_move_metadata(grpcshim_metadata_array *destination,
-                                       grpcshim_metadata_array *source) {
+void cgrpc_metadata_array_move_metadata(cgrpc_metadata_array *destination,
+                                       cgrpc_metadata_array *source) {
   destination->count = source->count;
   destination->capacity = source->capacity;
   destination->metadata = source->metadata;
@@ -69,7 +69,7 @@ void grpcshim_metadata_array_move_metadata(grpcshim_metadata_array *destination,
   source->metadata = NULL;
 }
 
-void grpcshim_metadata_array_append_metadata(grpcshim_metadata_array *metadata, const char *key, const char *value) {
+void cgrpc_metadata_array_append_metadata(cgrpc_metadata_array *metadata, const char *key, const char *value) {
   if (!metadata->count) {
     metadata->metadata = (grpc_metadata *) malloc(10 * sizeof(grpc_metadata));
     metadata->count = 0;

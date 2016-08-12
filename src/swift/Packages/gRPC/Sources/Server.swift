@@ -47,24 +47,24 @@ public class Server {
   ///
   /// - Parameter address: the address where the server will listen
   public init(address:String) {
-    s = grpcshim_server_create(address)
-    completionQueue = CompletionQueue(cq:grpcshim_server_get_completion_queue(s))
+    s = cgrpc_server_create(address)
+    completionQueue = CompletionQueue(cq:cgrpc_server_get_completion_queue(s))
   }
 
   deinit {
-    grpcshim_server_destroy(s)
+    cgrpc_server_destroy(s)
   }
 
   /// Starts the server
   public func start() {
-    grpcshim_server_start(s);
+    cgrpc_server_start(s);
   }
 
   /// Gets the next request sent to the server
   ///
   /// - Returns: a tuple containing the results of waiting and a possible Handler for the request
   public func getNextRequest(timeout: Double) -> (grpc_call_error, grpc_completion_type, Handler?) {
-    let handler = Handler(h:grpcshim_handler_create_with_server(s))
+    let handler = Handler(h:cgrpc_handler_create_with_server(s))
     let call_error = handler.requestCall(tag:101)
     if (call_error != GRPC_CALL_OK) {
       return (call_error, GRPC_OP_COMPLETE, nil)

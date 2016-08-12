@@ -52,39 +52,39 @@ public class Handler {
   init(h:UnsafeMutablePointer<Void>!) {
     self.h = h;
     self.requestMetadata = Metadata()
-    self.completionQueue = CompletionQueue(cq:grpcshim_handler_get_completion_queue(h))
+    self.completionQueue = CompletionQueue(cq:cgrpc_handler_get_completion_queue(h))
   }
 
   deinit {
-    grpcshim_handler_destroy(self.h)
+    cgrpc_handler_destroy(self.h)
   }
 
   /// Gets the host name sent with the request
   ///
   /// - Returns: the host name sent with the request
   public func host() -> String {
-    return String(cString:grpcshim_handler_host(h), encoding:String.Encoding.utf8)!;
+    return String(cString:cgrpc_handler_host(h), encoding:String.Encoding.utf8)!;
   }
 
   /// Gets the method name sent with the request
   ///
   /// - Returns: the method name sent with the request
   public func method() -> String {
-    return String(cString:grpcshim_handler_method(h), encoding:String.Encoding.utf8)!;
+    return String(cString:cgrpc_handler_method(h), encoding:String.Encoding.utf8)!;
   }
 
   /// Gets the caller identity associated with the request
   ///
   /// - Returns: a string representing the caller address
   public func caller() -> String {
-    return String(cString:grpcshim_handler_call_peer(h), encoding:String.Encoding.utf8)!;
+    return String(cString:cgrpc_handler_call_peer(h), encoding:String.Encoding.utf8)!;
   }
 
   /// Creates a call object associated with the handler
   ///
   /// - Returns: a Call object that can be used to respond to the request
   func call() -> Call {
-    return Call(call: grpcshim_handler_get_call(h), owned:false)
+    return Call(call: cgrpc_handler_get_call(h), owned:false)
   }
 
   /// Request a call for the handler
@@ -93,7 +93,7 @@ public class Handler {
   /// 
   /// - Returns: a grpc_call_error indicating the result of requesting the call
   func requestCall(tag: Int) -> grpc_call_error {
-    return grpcshim_handler_request_call(h, requestMetadata.array, tag)
+    return cgrpc_handler_request_call(h, requestMetadata.array, tag)
   }
 
   /// Receive the message sent with a call

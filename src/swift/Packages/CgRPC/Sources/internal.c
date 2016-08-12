@@ -31,14 +31,14 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include <stdio.h>
 #include <assert.h>
 
-void *grpcshim_create_tag(intptr_t t) { return (void *)t; }
+void *cgrpc_create_tag(intptr_t t) { return (void *)t; }
 
-gpr_timespec grpcshim_deadline_in_seconds_from_now(float seconds) {
+gpr_timespec cgrpc_deadline_in_seconds_from_now(float seconds) {
   return gpr_time_add(gpr_now(GPR_CLOCK_MONOTONIC),
                       gpr_time_from_millis((int64_t)(1e3 * seconds), GPR_TIMESPAN));
 }

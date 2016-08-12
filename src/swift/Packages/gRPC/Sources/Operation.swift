@@ -46,7 +46,7 @@ public class Operation {
   }
 
   deinit {
-    grpcshim_observer_destroy(observer);
+    cgrpc_observer_destroy(observer);
   }
 }
 
@@ -54,7 +54,7 @@ public class Operation {
 class Operation_SendInitialMetadata : Operation {
 
   init(metadata:Metadata) {
-    super.init(observer:grpcshim_observer_create_send_initial_metadata(metadata.array))
+    super.init(observer:cgrpc_observer_create_send_initial_metadata(metadata.array))
   }
 }
 
@@ -62,8 +62,8 @@ class Operation_SendInitialMetadata : Operation {
 class Operation_SendMessage : Operation {
 
   init(message:ByteBuffer) {
-    super.init(observer:grpcshim_observer_create_send_message())
-    grpcshim_observer_send_message_set_message(observer, message.b);
+    super.init(observer:cgrpc_observer_create_send_message())
+    cgrpc_observer_send_message_set_message(observer, message.b);
   }
 }
 
@@ -71,7 +71,7 @@ class Operation_SendMessage : Operation {
 class Operation_SendCloseFromClient : Operation {
 
   init() {
-    super.init(observer:grpcshim_observer_create_send_close_from_client())
+    super.init(observer:cgrpc_observer_create_send_close_from_client())
   }
 }
 
@@ -81,9 +81,9 @@ class Operation_SendStatusFromServer : Operation {
   init(status:Int,
        statusDetails:String,
        metadata:Metadata) {
-    super.init(observer:grpcshim_observer_create_send_status_from_server(metadata.array))
-    grpcshim_observer_send_status_from_server_set_status(observer, Int32(status));
-    grpcshim_observer_send_status_from_server_set_status_details(observer, statusDetails);
+    super.init(observer:cgrpc_observer_create_send_status_from_server(metadata.array))
+    cgrpc_observer_send_status_from_server_set_status(observer, Int32(status));
+    cgrpc_observer_send_status_from_server_set_status_details(observer, statusDetails);
   }
 }
 
@@ -91,10 +91,10 @@ class Operation_SendStatusFromServer : Operation {
 class Operation_ReceiveInitialMetadata : Operation {
 
   init() {
-    super.init(observer:grpcshim_observer_create_recv_initial_metadata())
+    super.init(observer:cgrpc_observer_create_recv_initial_metadata())
   }
   func metadata() -> Metadata {
-    return Metadata(array:grpcshim_observer_recv_initial_metadata_get_metadata(observer));
+    return Metadata(array:cgrpc_observer_recv_initial_metadata_get_metadata(observer));
   }
 }
 
@@ -102,11 +102,11 @@ class Operation_ReceiveInitialMetadata : Operation {
 class Operation_ReceiveMessage : Operation {
 
   init() {
-    super.init(observer:grpcshim_observer_create_recv_message())
+    super.init(observer:cgrpc_observer_create_recv_message())
   }
 
   func message() -> ByteBuffer? {
-    if let b = grpcshim_observer_recv_message_get_message(observer) {
+    if let b = cgrpc_observer_recv_message_get_message(observer) {
       return ByteBuffer(b:b)
     } else {
       return nil
@@ -118,19 +118,19 @@ class Operation_ReceiveMessage : Operation {
 class Operation_ReceiveStatusOnClient : Operation {
 
   init() {
-    super.init(observer:grpcshim_observer_create_recv_status_on_client())
+    super.init(observer:cgrpc_observer_create_recv_status_on_client())
   }
 
   func metadata() -> Metadata {
-    return Metadata(array:grpcshim_observer_recv_status_on_client_get_metadata(observer));
+    return Metadata(array:cgrpc_observer_recv_status_on_client_get_metadata(observer));
   }
 
   func status() -> Int {
-    return grpcshim_observer_recv_status_on_client_status(observer);
+    return cgrpc_observer_recv_status_on_client_status(observer);
   }
 
   func statusDetails() -> String {
-    return String(cString:grpcshim_observer_recv_status_on_client_status_details(observer), encoding:String.Encoding.utf8)!
+    return String(cString:cgrpc_observer_recv_status_on_client_status_details(observer), encoding:String.Encoding.utf8)!
   }
 }
 
@@ -138,6 +138,6 @@ class Operation_ReceiveStatusOnClient : Operation {
 class Operation_ReceiveCloseOnServer : Operation {
 
   init() {
-    super.init(observer:grpcshim_observer_create_recv_close_on_server())
+    super.init(observer:cgrpc_observer_create_recv_close_on_server())
   }
 }

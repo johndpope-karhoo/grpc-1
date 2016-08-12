@@ -34,7 +34,7 @@
   import CgRPC
 #endif
 
-/// Singleton class that provides a mutex for synchronizing calls to grpcshim_call_perform()
+/// Singleton class that provides a mutex for synchronizing calls to cgrpc_call_perform()
 private class CallLock {
   private var mutex : Mutex
   init() {
@@ -63,7 +63,7 @@ public class Call {
 
   deinit {
     if (owned) {
-      grpcshim_call_destroy(call)
+      cgrpc_call_destroy(call)
     }
   }
 
@@ -73,13 +73,13 @@ public class Call {
   /// - Parameter tag: integer tag that will be attached to these operations
   /// - Returns: the result of initiating the call
   func performOperations(operations: [Operation], tag: Int) -> grpc_call_error {
-    grpcshim_call_reserve_space_for_operations(call, Int32(operations.count))
+    cgrpc_call_reserve_space_for_operations(call, Int32(operations.count))
     for operation in operations {
-      grpcshim_call_add_operation(call, operation.observer)
+      cgrpc_call_add_operation(call, operation.observer)
     }
     let mutex = CallLock.sharedInstance.mutex
     mutex.lock()
-    let error = grpcshim_call_perform(call, tag)
+    let error = cgrpc_call_perform(call, tag)
     mutex.unlock()
     return error
   }

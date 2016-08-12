@@ -31,23 +31,23 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
-grpcshim_mutex *grpcshim_mutex_create() {
-  grpcshim_mutex *mu = (grpcshim_mutex *) malloc(sizeof(grpcshim_mutex));
+cgrpc_mutex *cgrpc_mutex_create() {
+  cgrpc_mutex *mu = (cgrpc_mutex *) malloc(sizeof(cgrpc_mutex));
   gpr_mu_init(mu);
   return mu;
 }
 
-void grpcshim_mutex_destroy(grpcshim_mutex *mu) {
+void cgrpc_mutex_destroy(cgrpc_mutex *mu) {
   gpr_mu_destroy(mu);
   free(mu);
 }
 
-void grpcshim_mutex_lock(grpcshim_mutex *mu) {
+void cgrpc_mutex_lock(cgrpc_mutex *mu) {
   gpr_mu_lock(mu);
 }
 
-void grpcshim_mutex_unlock(grpcshim_mutex *mu) {
+void cgrpc_mutex_unlock(cgrpc_mutex *mu) {
   gpr_mu_unlock(mu);
 }

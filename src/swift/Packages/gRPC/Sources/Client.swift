@@ -47,12 +47,12 @@ public class Client {
   ///
   /// - Parameter address: the address of the server to be called
   public init(address: String) {
-    c = grpcshim_client_create(address)
-    completionQueue = CompletionQueue(cq:grpcshim_client_completion_queue(c))
+    c = cgrpc_client_create(address)
+    completionQueue = CompletionQueue(cq:cgrpc_client_completion_queue(c))
   }
 
   deinit {
-    grpcshim_client_destroy(c)
+    cgrpc_client_destroy(c)
   }
 
   /// Constructs a Call object to make a gRPC API call
@@ -62,7 +62,7 @@ public class Client {
   /// - Parameter timeout: a timeout value in seconds
   /// - Returns: a Call object that can be used to make the request
   func createCall(host:String, method:String, timeout:Double) -> Call {
-    let call = grpcshim_client_create_call(c, method, host, timeout)!
+    let call = cgrpc_client_create_call(c, method, host, timeout)!
     return Call(call:call, owned:true)
   }
 

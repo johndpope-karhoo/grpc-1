@@ -1,5 +1,5 @@
 module CgRPC {
-  header "Sources/shim.h"
+  header "Sources/cgrpc.h"
   link "CgRPC"
   link "grpc"
   export *

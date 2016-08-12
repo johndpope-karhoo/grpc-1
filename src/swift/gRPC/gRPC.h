@@ -39,4 +39,4 @@ FOUNDATION_EXPORT double gRPCVersionNumber;
 FOUNDATION_EXPORT const unsigned char gRPCVersionString[];
 
 // Public headers
-#import <gRPC/shim.h>
+#import <gRPC/cgrpc.h>

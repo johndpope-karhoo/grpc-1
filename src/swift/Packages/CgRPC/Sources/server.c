@@ -31,15 +31,15 @@
  *
  */
 #include "internal.h"
-#include "shim.h"
+#include "cgrpc.h"
 
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-grpcshim_server *grpcshim_server_create(const char *address) {
-  grpcshim_server *server = (grpcshim_server *) malloc(sizeof (grpcshim_server));
+cgrpc_server *cgrpc_server_create(const char *address) {
+  cgrpc_server *server = (cgrpc_server *) malloc(sizeof (cgrpc_server));
   server->server = grpc_server_create(NULL, NULL);
   server->completion_queue = grpc_completion_queue_create(NULL);
   grpc_server_register_completion_queue(server->server, server->completion_queue, NULL);
@@ -48,28 +48,28 @@ grpcshim_server *grpcshim_server_create(const char *address) {
   return server;
 }
 
-void grpcshim_server_destroy(grpcshim_server *server) {
+void cgrpc_server_destroy(cgrpc_server *server) {
   grpc_server_shutdown_and_notify(server->server,
                                   server->completion_queue,
-                                  grpcshim_create_tag(1000));
+                                  cgrpc_create_tag(1000));
   grpc_event completion_event =
   grpc_completion_queue_pluck(server->completion_queue,
-                              grpcshim_create_tag(1000),
-                              grpcshim_deadline_in_seconds_from_now(5),
+                              cgrpc_create_tag(1000),
+                              cgrpc_deadline_in_seconds_from_now(5),
                               NULL);
   assert(completion_event.type == GRPC_OP_COMPLETE);
   grpc_server_destroy(server->server);
   server->server = NULL;
 
   grpc_completion_queue_shutdown(server->completion_queue);
-  grpcshim_completion_queue_drain(server->completion_queue);
+  cgrpc_completion_queue_drain(server->completion_queue);
   grpc_completion_queue_destroy(server->completion_queue);
 }
 
-void grpcshim_server_start(grpcshim_server *server) {
+void cgrpc_server_start(cgrpc_server *server) {
   grpc_server_start(server->server);
 }
 
-grpcshim_completion_queue *grpcshim_server_get_completion_queue(grpcshim_server *s) {
+cgrpc_completion_queue *cgrpc_server_get_completion_queue(cgrpc_server *s) {
   return s->completion_queue;
 }
