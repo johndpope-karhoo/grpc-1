@@ -61,10 +61,23 @@ public class Call {
     self.owned = owned
   }
 
+  // coming soon
+  init(call: UnsafeMutablePointer<Void>,
+       requestsWriter: Writer,
+       responsesWritable: Writable) {
+    self.call = call
+    self.owned = true
+  }
+
   deinit {
     if (owned) {
       cgrpc_call_destroy(call)
     }
+  }
+
+  // coming soon
+  func start() {
+
   }
 
   /// Initiate performance of a call without waiting for completion
