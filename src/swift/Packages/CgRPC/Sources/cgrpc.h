@@ -214,13 +214,6 @@ void cgrpc_observer_send_status_from_server_set_status_details
 cgrpc_metadata_array *cgrpc_observer_recv_initial_metadata_get_metadata
 (cgrpc_observer_recv_initial_metadata *observer);
 
-long cgrpc_observer_recv_initial_metadata_count
-(cgrpc_observer_recv_initial_metadata *observer);
-
-cgrpc_metadata *cgrpc_observer_recv_initial_metadata_metadata
-(cgrpc_observer_recv_initial_metadata *observer,
- long i);
-
 // GRPC_OP_RECV_MESSAGE
 cgrpc_byte_buffer *cgrpc_observer_recv_message_get_message
 (cgrpc_observer_recv_message *observer);
@@ -229,19 +222,10 @@ cgrpc_byte_buffer *cgrpc_observer_recv_message_get_message
 cgrpc_metadata_array *cgrpc_observer_recv_status_on_client_get_metadata
 (cgrpc_observer_recv_status_on_client *observer);
 
-
-
-long cgrpc_observer_recv_status_on_client_count
+long cgrpc_observer_recv_status_on_client_get_status
 (cgrpc_observer_recv_status_on_client *observer);
 
-cgrpc_metadata *cgrpc_observer_recv_status_on_client_metadata
-(cgrpc_observer_recv_status_on_client *observer,
- long i);
-
-long cgrpc_observer_recv_status_on_client_status
-(cgrpc_observer_recv_status_on_client *observer);
-
-const char *cgrpc_observer_recv_status_on_client_status_details
+const char *cgrpc_observer_recv_status_on_client_get_status_details
 (cgrpc_observer_recv_status_on_client *observer);
 
 // GRPC_OP_RECV_CLOSE_ON_SERVER

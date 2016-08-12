@@ -126,11 +126,11 @@ class Operation_ReceiveStatusOnClient : Operation {
   }
 
   func status() -> Int {
-    return cgrpc_observer_recv_status_on_client_status(observer);
+    return cgrpc_observer_recv_status_on_client_get_status(observer);
   }
 
   func statusDetails() -> String {
-    return String(cString:cgrpc_observer_recv_status_on_client_status_details(observer), encoding:String.Encoding.utf8)!
+    return String(cString:cgrpc_observer_recv_status_on_client_get_status_details(observer), encoding:String.Encoding.utf8)!
   }
 }
 

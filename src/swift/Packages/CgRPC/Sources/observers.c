@@ -50,7 +50,6 @@ cgrpc_observer_send_message *cgrpc_observer_create_send_message() {
   cgrpc_observer_send_message *observer =
   (cgrpc_observer_send_message *) malloc(sizeof (cgrpc_observer_send_message));
   observer->op_type = GRPC_OP_SEND_MESSAGE;
-
   return observer;
 }
 
@@ -58,7 +57,6 @@ cgrpc_observer_send_close_from_client *cgrpc_observer_create_send_close_from_cli
   cgrpc_observer_send_close_from_client *observer =
   (cgrpc_observer_send_close_from_client *) malloc(sizeof (cgrpc_observer_send_close_from_client));
   observer->op_type = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
-
   return observer;
 }
 
@@ -234,14 +232,6 @@ cgrpc_metadata_array *cgrpc_observer_recv_initial_metadata_get_metadata(cgrpc_ob
   return metadata;
 }
 
-long cgrpc_observer_recv_initial_metadata_count(cgrpc_observer_recv_initial_metadata *observer) {
-  return observer->initial_metadata_recv.count;
-}
-
-cgrpc_metadata *cgrpc_observer_recv_initial_metadata_metadata(cgrpc_observer_recv_initial_metadata *observer, long i) {
-  return &(observer->initial_metadata_recv.metadata[i]);
-}
-
 void cgrpc_observer_send_message_set_message(cgrpc_observer_send_message *observer, cgrpc_byte_buffer *message) {
   observer->request_payload = grpc_byte_buffer_copy(message);
 }
@@ -260,23 +250,15 @@ cgrpc_metadata_array *cgrpc_observer_recv_status_on_client_get_metadata(cgrpc_ob
   return metadata;
 }
 
-long cgrpc_observer_recv_status_on_client_count(cgrpc_observer_recv_status_on_client *observer) {
-  return observer->trailing_metadata_recv.count;
-}
-
-cgrpc_metadata *cgrpc_observer_recv_status_on_client_metadata(cgrpc_observer_recv_status_on_client *observer, long i) {
-  return &(observer->trailing_metadata_recv.metadata[i]);
-}
-
-long cgrpc_observer_recv_status_on_client_status(cgrpc_observer_recv_status_on_client *observer) {
+long cgrpc_observer_recv_status_on_client_get_status(cgrpc_observer_recv_status_on_client *observer) {
   return observer->server_status;
 }
 
-const char *cgrpc_observer_recv_status_on_client_status_details(cgrpc_observer_recv_status_on_client *observer) {
+const char *cgrpc_observer_recv_status_on_client_get_status_details(cgrpc_observer_recv_status_on_client *observer) {
   return observer->server_details;
 }
 
-int cgrpc_observer_recv_close_on_server_was_cancelled(cgrpc_observer_recv_close_on_server *observer) {
+int cgrpc_observer_recv_close_on_server_get_was_cancelled(cgrpc_observer_recv_close_on_server *observer) {
   return observer->was_cancelled;
 }
 
