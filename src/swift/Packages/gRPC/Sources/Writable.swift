@@ -33,6 +33,7 @@
 #if SWIFT_PACKAGE
   import CgRPC
 #endif
+import Foundation
 
 // An object to which a sequence of values can be sent
 protocol Writable {
